@@ -1,0 +1,488 @@
+:root {
+    /* Main Color Scheme */
+    --primary-color: #A2BC58;
+    --secondary-color: #F1DEBD;
+    --accent-color-1: #4A2A1B;
+    --accent-color-2: #FF1B1C;
+    --accent-color-3: #0E7C7B;
+    
+    /* UI Colors */
+    --background-color: #F7F4EC;
+    --card-color: #FFFFFF;
+    --dark-text: #333333;
+    --light-text: #FFFFFF;
+    
+    /* Attribute Colors */
+    --technique-color: var(--accent-color-3);
+    --ingredients-color: var(--primary-color);
+    --flavor-color: var(--accent-color-2);
+    --management-color: var(--accent-color-1);
+    
+    /* UI Dimensions */
+    --header-height: 60px;
+    --footer-height: 60px;
+}
+
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--dark-text);
+    line-height: 1.6;
+    padding-bottom: var(--footer-height);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Header Styles */
+header {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 1rem;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    height: var(--header-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.rank-display {
+    font-size: 1rem;
+    margin-top: 0.3rem;
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-top: calc(var(--header-height) + 20px);
+    padding: 1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 2rem;
+}
+
+/* Dashboard Styles */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.attribute-card {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.attribute-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attribute-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.technique-icon {
+    background-color: var(--technique-color);
+}
+
+.ingredients-icon {
+    background-color: var(--ingredients-color);
+}
+
+.flavor-icon {
+    background-color: var(--flavor-color);
+}
+
+.management-icon {
+    background-color: var(--management-color);
+}
+
+.progress-bar {
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.technique-fill {
+    background-color: var(--technique-color);
+}
+
+.ingredients-fill {
+    background-color: var(--ingredients-color);
+}
+
+.flavor-fill {
+    background-color: var(--flavor-color);
+}
+
+.management-fill {
+    background-color: var(--management-color);
+}
+
+.hours-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Quest Cards */
+.quest-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.quest-card {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.quest-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.quest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.quest-type {
+    color: var(--light-text);
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.training-quest {
+    background-color: var(--technique-color);
+}
+
+.side-quest {
+    background-color: var(--ingredients-color);
+}
+
+.main-quest {
+    background-color: var(--flavor-color);
+}
+
+.explore-quest {
+    background-color: var(--management-color);
+}
+
+.challenge-quest {
+    background-color: #9b59b6; /* Purple for challenges */
+}
+
+.quest-time {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.quest-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.quest-description {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.rewards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.reward-pill {
+    display: flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.technique-reward {
+    background-color: var(--technique-color);
+}
+
+.ingredients-reward {
+    background-color: var(--ingredients-color);
+}
+
+.flavor-reward {
+    background-color: var(--flavor-color);
+}
+
+.management-reward {
+    background-color: var(--management-color);
+}
+
+.all-attributes-reward {
+    background-color: #9b59b6; /* Purple for all attributes */
+}
+
+/* Quest Detail Modal */
+.quest-detail-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 90%;
+    width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+.materials-list, .objectives-list, .instructions-list {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.materials-list li, .objectives-list li {
+    margin-bottom: 0.5rem;
+}
+
+.instructions-list li {
+    margin-bottom: 0.8rem;
+}
+
+.instruction-step {
+    font-weight: bold;
+}
+
+.random-element {
+    background-color: var(--background-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 2px dashed var(--secondary-color);
+}
+
+.randomize-button {
+    background-color: var(--secondary-color);
+    color: var(--dark-text);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.complete-button {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.complete-button:hover {
+    background-color: #8fa749; /* Slightly darker green */
+}
+
+.complete-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--secondary-color);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 0.5rem 0;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    height: var(--footer-height);
+    z-index: 100;
+}
+
+.nav-tab {
+    text-align: center;
+    color: var(--dark-text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.3rem;
+    transition: background-color 0.2s;
+}
+
+.nav-tab.active {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.tab-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 300;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.notification.hidden {
+    transform: translateX(110%);
+    opacity: 0;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
+.collapsed .toggle-icon {
+    transform: rotate(0deg);
+}
+
+.section-title .toggle-icon {
+    transform: rotate(45deg);
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+    .quest-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+}
