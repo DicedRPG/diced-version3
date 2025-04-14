@@ -9,7 +9,7 @@ const DataManager = (() => {
     // Configuration
     const CONFIG = {
         // URL for quest data - replace with your GitHub URL
-        questDataUrl: 'https://dicedrpg.github.io/diced-rpg-data/quest.json',
+        questDataUrl: 'https://dicedrpg.github.io/diced-rpg-data/data/quest.json',
         
         // Local storage keys
         storageKeys: {
