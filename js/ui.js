@@ -80,29 +80,27 @@ const UIManager = (() => {
 function toggleSection(sectionId) {
     console.log('Toggle section called for:', sectionId);
     
+    // Get the section element
     const section = document.getElementById(sectionId);
-    const title = document.querySelector(`[data-section="${sectionId}"]`);
-    
     if (!section) {
         console.error('Section element not found:', sectionId);
-        return;
-    }
-    
-    if (!title) {
-        console.error('Title element not found for section:', sectionId);
         return;
     }
     
     // Toggle the hidden class on the section
     section.classList.toggle('hidden');
     
-    // Toggle the collapsed class on the title
-    title.classList.toggle('collapsed');
-    
-    // Update the toggle icon
-    const toggleIcon = title.querySelector('.toggle-icon');
-    if (toggleIcon) {
-        toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
+    // Find the title element that triggered this (it has the onclick attribute)
+    const title = document.querySelector(`.section-title[onclick*="${sectionId}"]`);
+    if (title) {
+        // Toggle the collapsed class on the title
+        title.classList.toggle('collapsed');
+        
+        // Update the toggle icon
+        const toggleIcon = title.querySelector('.toggle-icon');
+        if (toggleIcon) {
+            toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
+        }
     }
     
     console.log('Section toggled. Hidden:', section.classList.contains('hidden'));
