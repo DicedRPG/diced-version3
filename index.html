@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICED: A Culinary RPG</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Preconnect to your GitHub for faster loading -->
+    <link rel="preconnect" href="https://yourusername.github.io">
+</head>
+<body>
+    <!-- App Header -->
+    <header>
+        <h1 class="app-title">DICED</h1>
+        <div id="rank-display" class="rank-display">Home Cook (Bronze) • Level 1</div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Attributes Dashboard -->
+        <div id="attributes-dashboard" class="dashboard">
+            <!-- Attribute cards will be dynamically inserted here -->
+        </div>
+        
+        <!-- Daily Quests Section -->
+        <h2 class="section-title">Daily Quests</h2>
+        <div id="available-quests" class="quest-cards">
+            <!-- Quest cards will be dynamically inserted here -->
+        </div>
+        
+        <!-- Recommended Quests Section -->
+        <h2 class="section-title">Recommended Next</h2>
+        <div id="recommended-quests" class="quest-cards">
+            <!-- Recommended quest cards will be dynamically inserted here -->
+        </div>
+        
+        <!-- Upcoming Challenge Section -->
+        <h2 class="section-title">Upcoming Challenge</h2>
+        <div id="challenge-quests" class="quest-cards">
+            <!-- Challenge quests will be dynamically inserted here -->
+        </div>
+        
+        <!-- Completed Quests Section (collapsed by default) -->
+        <h2 class="section-title collapsed" onclick="toggleSection('completed-quests-section')">
+            Completed Quests <span class="toggle-icon">+</span>
+        </h2>
+        <div id="completed-quests-section" class="quest-cards hidden">
+            <!-- Completed quests will be dynamically inserted here -->
+        </div>
+    </div>
+    
+    <!-- Quest Detail Modal -->
+    <div id="quest-detail-modal" class="quest-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Quest Details</h2>
+                <button class="close-button" onclick="closeQuestDetail()">×</button>
+            </div>
+            
+            <div id="modal-content">
+                <!-- Quest details will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <a href="#" class="nav-tab active" data-tab="quests">
+            <div class="tab-icon">📋</div>
+            Quests
+        </a>
+        <a href="#" class="nav-tab" data-tab="progress">
+            <div class="tab-icon">📊</div>
+            Progress
+        </a>
+        <a href="#" class="nav-tab" data-tab="skills">
+            <div class="tab-icon">🍳</div>
+            Skills
+        </a>
+        <a href="#" class="nav-tab" data-tab="journal">
+            <div class="tab-icon">📝</div>
+            Journal
+        </a>
+    </nav>
+
+    <!-- Success Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span id="notification-message">Quest completed successfully!</span>
+            <button class="close-button" onclick="hideNotification()">×</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/quests.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
