@@ -74,7 +74,8 @@ header {
 
 /* Main Content Styles */
 .main-content {
-    margin-top: calc(var(--header-height) + 20px);
+    /* margin-top: calc(var(--header-height) + 20px); */
+    margin-top: 5rem;
     padding: 1rem;
     max-width: 800px;
     margin-left: auto;
