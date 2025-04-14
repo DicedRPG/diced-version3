@@ -1,15 +1,26 @@
 :root {
-            --primary-color:#A2BC58;
-            --secondary-color: #F1DEBD;
-            --accent-color: #4A2A1B;
-            --light-color: #fefae0;
-            --dark-color: #283618;
-            --background-color: #faedcd;
-            --card-color: #fff;
-            --technique-color: #0077b6;
-            --ingredients-color: #2a9d8f;
-            --flavor-color: #e63946;
-            --management-color: #9c6644;
+            /* Main Color Scheme */
+    --primary-color: #A2BC58;
+    --secondary-color: #F1DEBD;
+    --accent-color-1: #4A2A1B;
+    --accent-color-2: #FF1B1C;
+    --accent-color-3: #0E7C7B;
+    
+    /* UI Colors */
+    --background-color: #F7F4EC;
+    --card-color: #FFFFFF;
+    --dark-text: #333333;
+    --light-text: #FFFFFF;
+    
+    /* Attribute Colors */
+    --technique-color: var(--accent-color-3);
+    --ingredients-color: var(--primary-color);
+    --flavor-color: var(--accent-color-2);
+    --management-color: var(--accent-color-1);
+    
+    /* UI Dimensions */
+    --header-height: 80px;
+    --footer-height: 60px;
         }
         
         body {
