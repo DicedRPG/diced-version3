@@ -1,0 +1,363 @@
+:root {
+            --primary-color: #8d4b26;
+            --secondary-color: #d4a373;
+            --accent-color: #606c38;
+            --light-color: #fefae0;
+            --dark-color: #283618;
+            --background-color: #faedcd;
+            --card-color: #fff;
+            --technique-color: #0077b6;
+            --ingredients-color: #2a9d8f;
+            --flavor-color: #e63946;
+            --management-color: #9c6644;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            color: var(--dark-color);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .app-title {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .rank-display {
+            font-size: 1rem;
+            margin-top: 0.3rem;
+        }
+        
+        .main-content {
+            margin-top: 5rem;
+            padding: 1rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .attribute-card {
+            background-color: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .attribute-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .attribute-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            background-color: #ccc;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .technique-icon {
+            background-color: var(--technique-color);
+        }
+        
+        .ingredients-icon {
+            background-color: var(--ingredients-color);
+        }
+        
+        .flavor-icon {
+            background-color: var(--flavor-color);
+        }
+        
+        .management-icon {
+            background-color: var(--management-color);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .technique-fill {
+            background-color: var(--technique-color);
+        }
+        
+        .ingredients-fill {
+            background-color: var(--ingredients-color);
+        }
+        
+        .flavor-fill {
+            background-color: var(--flavor-color);
+        }
+        
+        .management-fill {
+            background-color: var(--management-color);
+        }
+        
+        .hours-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .quest-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .quest-card {
+            background-color: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .quest-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quest-type {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .training-quest {
+            background-color: var(--technique-color);
+            color: white;
+        }
+        
+        .side-quest {
+            background-color: var(--ingredients-color);
+            color: white;
+        }
+        
+        .main-quest {
+            background-color: var(--flavor-color);
+            color: white;
+        }
+        
+        .explore-quest {
+            background-color: var(--management-color);
+            color: white;
+        }
+        
+        .quest-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .quest-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .quest-description {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .rewards {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .reward-pill {
+            display: flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            color: white;
+        }
+        
+        .technique-reward {
+            background-color: var(--technique-color);
+        }
+        
+        .ingredients-reward {
+            background-color: var(--ingredients-color);
+        }
+        
+        .flavor-reward {
+            background-color: var(--flavor-color);
+        }
+        
+        .management-reward {
+            background-color: var(--management-color);
+        }
+        
+        .quest-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .materials-list, .objectives-list, .instructions-list {
+            padding-left: 1.5rem;
+        }
+        
+        .materials-list li, .objectives-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions-list li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .instruction-step {
+            font-weight: bold;
+        }
+        
+        .random-element {
+            background-color: var(--background-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 2px dashed var(--secondary-color);
+        }
+        
+        .randomize-button {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .complete-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.8rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--secondary-color);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 0.8rem 0;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab {
+            text-align: center;
+            color: var(--dark-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tab-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .quest-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
