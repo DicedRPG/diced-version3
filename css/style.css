@@ -192,22 +192,22 @@
         }
         
         .training-quest {
-            background-color: var(--technique-color);
-            color: white;
-        }
-        
-        .side-quest {
             background-color: var(--ingredients-color);
             color: white;
         }
         
-        .main-quest {
+        .side-quest {
             background-color: var(--flavor-color);
             color: white;
         }
         
-        .explore-quest {
+        .main-quest {
             background-color: var(--management-color);
+            color: white;
+        }
+        
+        .explore-quest {
+            background-color: var(--technique-color);
             color: white;
         }
         
