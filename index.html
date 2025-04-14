@@ -91,27 +91,71 @@
         </div>
     </div>
 
-    <script>
-    // Dedicated function just for completed quests toggle
-    function toggleCompletedQuests() {
-        const section = document.getElementById('completed-quests-section');
-        const button = document.querySelector('.section-title.collapsed');
-        const icon = button.querySelector('.toggle-icon');
-        
-        // Toggle section visibility
-        if (section.classList.contains('hidden')) {
-            section.classList.remove('hidden');
-            icon.textContent = '−';
-        } else {
-            section.classList.add('hidden');
-            icon.textContent = '+';
-        }
-        
-        // Toggle button state
-        button.classList.toggle('collapsed');
-        
-        console.log('Completed quests section toggled');
+    <!-- Add this script at the end of your index.html, just before the closing </body> tag -->
+<script>
+  // This script runs after the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find the "Completed Quests" heading
+    const heading = Array.from(document.querySelectorAll('.section-title')).find(
+      el => el.textContent.trim().startsWith('Completed Quests')
+    );
+    
+    if (!heading) {
+      console.error('Could not find Completed Quests heading');
+      return;
     }
+    
+    console.log('Found Completed Quests heading:', heading);
+    
+    // Create a container for completed quests if it doesn't exist
+    let container = document.getElementById('completed-quests-section');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'completed-quests-section';
+      container.className = 'quest-cards hidden';
+      
+      // Insert it after the heading
+      heading.parentNode.insertBefore(container, heading.nextSibling);
+      console.log('Created container for completed quests');
+    }
+    
+    // Find all completed quest cards (all quest cards after the heading but before the next heading)
+    const completedCards = [];
+    let currentElement = heading.nextElementSibling;
+    
+    while (currentElement && !currentElement.classList.contains('section-title')) {
+      if (currentElement.classList.contains('quest-card')) {
+        completedCards.push(currentElement);
+      }
+      currentElement = currentElement.nextElementSibling;
+    }
+    
+    // Move completed cards into the container
+    completedCards.forEach(card => {
+      container.appendChild(card);
+    });
+    
+    console.log(`Moved ${completedCards.length} completed quest cards into container`);
+    
+    // Add click handler to heading
+    heading.addEventListener('click', function() {
+      console.log('Heading clicked');
+      container.classList.toggle('hidden');
+      
+      // Update the icon
+      const icon = heading.querySelector('.toggle-icon');
+      if (icon) {
+        icon.textContent = container.classList.contains('hidden') ? '+' : '−';
+      }
+      
+      // Toggle collapsed class on heading
+      heading.classList.toggle('collapsed');
+      
+      console.log('Toggle state:', container.classList.contains('hidden') ? 'hidden' : 'visible');
+    });
+    
+    console.log('Added click handler to Completed Quests heading');
+  });
 </script>
 
     <!-- Scripts -->
