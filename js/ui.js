@@ -50,48 +50,62 @@ const UIManager = (() => {
      * Set up event listeners for UI interactions
      */
     function setupEventListeners() {
-    console.log('Setting up event listeners'); // Debug log
+    console.log('Setting up event listeners');
     
     // Tab navigation
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', handleTabClick);
     });
     
-    // IMPORTANT: Direct approach for the Completed Quests section toggle
-    const completedQuestsTitle = document.querySelector('.section-title.collapsed');
-    if (completedQuestsTitle) {
-        console.log('Found collapsed section title:', completedQuestsTitle.textContent);
+    // Section toggles - IMPORTANT: Use this approach instead of inline onclick attributes
+    document.querySelectorAll('.section-title.collapsed').forEach(title => {
+        // Remove any existing onclick attribute to prevent double-firing
+        title.removeAttribute('onclick');
         
-        // Remove any existing click event to avoid duplicates
-        completedQuestsTitle.removeEventListener('click', handleSectionToggle);
-        
-        // Add new click event
-        completedQuestsTitle.addEventListener('click', handleSectionToggle);
-    } else {
-        console.error('Could not find collapsed section title');
-    }
+        // Add click event listener
+        title.addEventListener('click', function() {
+            // Get the section ID from the data attribute
+            const sectionId = this.getAttribute('data-section');
+            if (sectionId) {
+                toggleSection(sectionId);
+            }
+        });
+    });
 }
 
-     /**
- * Handle section toggle clicks
- * @param {Event} event - The click event
+/**
+ * Toggle a collapsible section
+ * @param {string} sectionId - The section ID
  */
-function handleSectionToggle(event) {
-    // Get the section ID from the onclick attribute if available
-    const onclickAttr = event.currentTarget.getAttribute('onclick');
+function toggleSection(sectionId) {
+    console.log('Toggle section called for:', sectionId);
     
-    if (onclickAttr) {
-        const match = onclickAttr.match(/'([^']+)'/);
-        if (match && match[1]) {
-            toggleSection(match[1]);
-        }
-    } else {
-        // Fallback - try to find the next sibling element
-        const sectionElement = event.currentTarget.nextElementSibling;
-        if (sectionElement && sectionElement.id) {
-            toggleSection(sectionElement.id);
-        }
+    const section = document.getElementById(sectionId);
+    const title = document.querySelector(`[data-section="${sectionId}"]`);
+    
+    if (!section) {
+        console.error('Section element not found:', sectionId);
+        return;
     }
+    
+    if (!title) {
+        console.error('Title element not found for section:', sectionId);
+        return;
+    }
+    
+    // Toggle the hidden class on the section
+    section.classList.toggle('hidden');
+    
+    // Toggle the collapsed class on the title
+    title.classList.toggle('collapsed');
+    
+    // Update the toggle icon
+    const toggleIcon = title.querySelector('.toggle-icon');
+    if (toggleIcon) {
+        toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
+    }
+    
+    console.log('Section toggled. Hidden:', section.classList.contains('hidden'));
 }
     
     /**
