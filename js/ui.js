@@ -78,32 +78,40 @@ const UIManager = (() => {
  * @param {string} sectionId - The section ID
  */
 function toggleSection(sectionId) {
-    console.log('Toggle section called for:', sectionId);
-    
-    // Get the section element
+    // Get the section to toggle
     const section = document.getElementById(sectionId);
     if (!section) {
-        console.error('Section element not found:', sectionId);
+        console.error('Section not found:', sectionId);
         return;
     }
+
+    // Toggle visibility
+    const isHidden = section.classList.contains('hidden');
+    console.log('Current state - hidden:', isHidden);
     
-    // Toggle the hidden class on the section
-    section.classList.toggle('hidden');
-    
-    // Find the title element that triggered this (it has the onclick attribute)
-    const title = document.querySelector(`.section-title[onclick*="${sectionId}"]`);
-    if (title) {
-        // Toggle the collapsed class on the title
-        title.classList.toggle('collapsed');
-        
-        // Update the toggle icon
-        const toggleIcon = title.querySelector('.toggle-icon');
-        if (toggleIcon) {
-            toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
-        }
+    if (isHidden) {
+        section.classList.remove('hidden');
+        console.log('Showing section');
+    } else {
+        section.classList.add('hidden');
+        console.log('Hiding section');
     }
     
-    console.log('Section toggled. Hidden:', section.classList.contains('hidden'));
+    // Try to find and update the toggle icon
+    try {
+        // Get the button that was clicked (has the onclick attribute)
+        const buttons = document.querySelectorAll('.section-title');
+        buttons.forEach(button => {
+            if (button.getAttribute('onclick')?.includes(sectionId)) {
+                const icon = button.querySelector('.toggle-icon');
+                if (icon) {
+                    icon.textContent = isHidden ? '−' : '+';
+                }
+            }
+        });
+    } catch (e) {
+        console.log('Could not update icon, but section was toggled');
+    }
 }
     
     /**
