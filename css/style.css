@@ -44,7 +44,7 @@
         }
         
         .main-content {
-            margin-top: 5rem;
+            margin-top: calc(var(--header-height) + 20px);
             padding: 1rem;
             max-width: 800px;
             margin-left: auto;
