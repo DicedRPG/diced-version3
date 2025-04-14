@@ -50,19 +50,49 @@ const UIManager = (() => {
      * Set up event listeners for UI interactions
      */
     function setupEventListeners() {
-        // Tab navigation
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', handleTabClick);
-        });
+    console.log('Setting up event listeners'); // Debug log
+    
+    // Tab navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', handleTabClick);
+    });
+    
+    // IMPORTANT: Direct approach for the Completed Quests section toggle
+    const completedQuestsTitle = document.querySelector('.section-title.collapsed');
+    if (completedQuestsTitle) {
+        console.log('Found collapsed section title:', completedQuestsTitle.textContent);
         
-        // Section toggles
-        document.querySelectorAll('.section-title.collapsed').forEach(title => {
-            title.addEventListener('click', event => {
-                const sectionId = event.currentTarget.getAttribute('onclick').match(/'([^']+)'/)[1];
-                toggleSection(sectionId);
-            });
-        });
+        // Remove any existing click event to avoid duplicates
+        completedQuestsTitle.removeEventListener('click', handleSectionToggle);
+        
+        // Add new click event
+        completedQuestsTitle.addEventListener('click', handleSectionToggle);
+    } else {
+        console.error('Could not find collapsed section title');
     }
+}
+
+     /**
+ * Handle section toggle clicks
+ * @param {Event} event - The click event
+ */
+function handleSectionToggle(event) {
+    // Get the section ID from the onclick attribute if available
+    const onclickAttr = event.currentTarget.getAttribute('onclick');
+    
+    if (onclickAttr) {
+        const match = onclickAttr.match(/'([^']+)'/);
+        if (match && match[1]) {
+            toggleSection(match[1]);
+        }
+    } else {
+        // Fallback - try to find the next sibling element
+        const sectionElement = event.currentTarget.nextElementSibling;
+        if (sectionElement && sectionElement.id) {
+            toggleSection(sectionElement.id);
+        }
+    }
+}
     
     /**
      * Handle tab navigation clicks
