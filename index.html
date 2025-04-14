@@ -92,10 +92,11 @@
     </div>
 
     <!-- Add this script at the end of your index.html, just before the closing </body> tag -->
+<!-- Add this script at the end of your index.html, replacing any previously added scripts -->
 <script>
-  // This script runs after the page loads
+  // Wait for DOM to be fully loaded
   document.addEventListener('DOMContentLoaded', function() {
-    // Find the "Completed Quests" heading
+    // Clean up any existing event listeners first
     const heading = Array.from(document.querySelectorAll('.section-title')).find(
       el => el.textContent.trim().startsWith('Completed Quests')
     );
@@ -105,7 +106,9 @@
       return;
     }
     
-    console.log('Found Completed Quests heading:', heading);
+    // Remove existing event listeners by cloning the element
+    const newHeading = heading.cloneNode(true);
+    heading.parentNode.replaceChild(newHeading, heading);
     
     // Create a container for completed quests if it doesn't exist
     let container = document.getElementById('completed-quests-section');
@@ -115,13 +118,12 @@
       container.className = 'quest-cards hidden';
       
       // Insert it after the heading
-      heading.parentNode.insertBefore(container, heading.nextSibling);
-      console.log('Created container for completed quests');
+      newHeading.parentNode.insertBefore(container, newHeading.nextSibling);
     }
     
-    // Find all completed quest cards (all quest cards after the heading but before the next heading)
+    // Find all completed quest cards
     const completedCards = [];
-    let currentElement = heading.nextElementSibling;
+    let currentElement = newHeading.nextElementSibling;
     
     while (currentElement && !currentElement.classList.contains('section-title')) {
       if (currentElement.classList.contains('quest-card')) {
@@ -135,26 +137,38 @@
       container.appendChild(card);
     });
     
-    console.log(`Moved ${completedCards.length} completed quest cards into container`);
+    // Add a flag to track if we're currently handling a click
+    let isHandlingClick = false;
     
-    // Add click handler to heading
-    heading.addEventListener('click', function() {
-      console.log('Heading clicked');
+    // Add NEW click handler to heading
+    newHeading.addEventListener('click', function(event) {
+      // Prevent handling multiple events
+      if (isHandlingClick) return;
+      isHandlingClick = true;
+      
+      console.log('Heading clicked - single event');
+      
+      // Toggle visibility
       container.classList.toggle('hidden');
       
       // Update the icon
-      const icon = heading.querySelector('.toggle-icon');
+      const icon = newHeading.querySelector('.toggle-icon');
       if (icon) {
         icon.textContent = container.classList.contains('hidden') ? '+' : '−';
       }
       
       // Toggle collapsed class on heading
-      heading.classList.toggle('collapsed');
+      newHeading.classList.toggle('collapsed');
       
       console.log('Toggle state:', container.classList.contains('hidden') ? 'hidden' : 'visible');
+      
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isHandlingClick = false;
+      }, 100);
     });
     
-    console.log('Added click handler to Completed Quests heading');
+    console.log('Completed quests toggle is ready');
   });
 </script>
 
