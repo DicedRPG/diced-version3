@@ -19,7 +19,7 @@
     --management-color: var(--accent-color-1);
     
     /* UI Dimensions */
-    --header-height: 60px;
+    --header-height: 80px;
     --footer-height: 60px;
 }
 
@@ -74,8 +74,7 @@ header {
 
 /* Main Content Styles */
 .main-content {
-    /* margin-top: calc(var(--header-height) + 20px); */
-    margin-top: 10vh;
+    margin-top: calc(var(--header-height) + 20px);
     padding: 1rem;
     max-width: 800px;
     margin-left: auto;
