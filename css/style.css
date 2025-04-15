@@ -25,7 +25,8 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
+            /*background-color: var(--background-color);*/
+            background-img: 'src/header-bg.jpg'
             margin: 0;
             padding: 0;
             color: var(--dark-color);
