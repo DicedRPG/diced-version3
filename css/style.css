@@ -377,6 +377,44 @@
             font-size: 1.5rem;
             margin-bottom: 0.2rem;
         }
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 300;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.notification.hidden {
+    transform: translateX(110%);
+    opacity: 0;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
+.collapsed .toggle-icon {
+    transform: rotate(0deg);
+}
+
+.section-title .toggle-icon {
+    transform: rotate(45deg);
+}
         
         @media (min-width: 768px) {
             .quest-cards {
