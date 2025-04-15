@@ -63,6 +63,7 @@
         
         .main-content {
             margin-top: calc(var(--header-height) + 20px);
+            border-radius: 0.5rem;
             background-color: rgba(247, 244, 236, 0.95);  /* Your background color with alpha transparency */
             padding: 1rem;
             max-width: 800px;
