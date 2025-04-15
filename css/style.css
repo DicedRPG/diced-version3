@@ -26,7 +26,11 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             /*background-color: var(--background-color);*/
-            background-image: url('src/header-bg.jpg');
+            background-image: url('../src/header-bg.jpg');
+            background-size: cover;  /* This stretches the image to cover the entire viewport */
+            background-position: center;  /* Centers the image */
+            background-repeat: no-repeat;  /* Prevents the image from repeating */
+            background-attachment: fixed;  /* Keeps the image fixed during scroll */
             margin: 0;
             padding: 0;
             /*color: var(--dark-color);*/
