@@ -104,7 +104,7 @@
         }
         
         .technique-icon {
-            background-color: var(--technique-color);
+            background-image: url('../src/icon_50x50.jpg');
         }
         
         .ingredients-icon {
