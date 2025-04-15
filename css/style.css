@@ -558,7 +558,7 @@
 }
 
 /* Skill connections */
-.skill-connection {
+/*.skill-connection {
     position: absolute;
     background-color: #ccc;
     z-index: -1;
@@ -566,7 +566,7 @@
 
 .skill-connection.mastered {
     background-color: var(--primary-color);
-}
+}*/
 
 /* Skill Detail Modal */
 .skill-learn-button {
