@@ -420,6 +420,209 @@
 .section-title .toggle-icon {
     transform: rotate(45deg);
 }
+
+/* Skills Tab Styles */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.category-filter {
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: var(--secondary-color);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.category-filter.active {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+}
+
+.category-filter:hover {
+    opacity: 0.9;
+}
+
+/* Skill Category Section */
+.skill-category {
+    margin-bottom: 2rem;
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.category-icon {
+    font-size: 1.5rem;
+}
+
+.difficulty-section {
+    margin-bottom: 1.5rem;
+}
+
+.difficulty-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    border-left: 4px solid var(--secondary-color);
+}
+
+/* Skill Tree */
+.skill-tree {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.skill-node {
+    position: relative;
+    width: 100px;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: var(--card-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.skill-node:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.skill-node.mastered {
+    border: 2px solid var(--primary-color);
+}
+
+.skill-node.available {
+    background-color: var(--background-color);
+}
+
+.skill-node.locked {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.skill-node.locked:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.skill-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.skill-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.mastery-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* Skill connections */
+.skill-connection {
+    position: absolute;
+    background-color: #ccc;
+    z-index: -1;
+}
+
+.skill-connection.mastered {
+    background-color: var(--primary-color);
+}
+
+/* Skill Detail Modal */
+.skill-learn-button {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.skill-learn-button:hover {
+    background-color: #8fa749;
+}
+
+.skill-learn-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.prerequisites-list {
+    margin-bottom: 1rem;
+}
+
+.prerequisite-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.prerequisite-icon {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.prerequisite-icon.completed {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.prerequisite-icon.missing {
+    background-color: #ccc;
+}
+
+/* Media Queries */
+@media (max-width: 480px) {
+    .skill-tree {
+        justify-content: center;
+    }
+}
         
         @media (min-width: 768px) {
             .quest-cards {
