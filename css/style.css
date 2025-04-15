@@ -35,6 +35,7 @@
             padding: 0;
             /*color: var(--dark-color);*/
             padding-bottom: var(--footer-height);
+            color: var(--dark-text);  /* Make sure text is readable against the background */
         }
         
         header {
@@ -62,6 +63,7 @@
         
         .main-content {
             margin-top: calc(var(--header-height) + 20px);
+            background-color: rgba(247, 244, 236, 0.85);  /* Your background color with alpha transparency */
             padding: 1rem;
             max-width: 800px;
             margin-left: auto;
