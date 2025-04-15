@@ -17,6 +17,8 @@
 
     <!-- Main Content Area -->
     <div class="main-content">
+    <!-- Quests Tab Content -->
+    <div id="quests-tab" class="tab-content active">
         <!-- Attributes Dashboard -->
         <div id="attributes-dashboard" class="dashboard">
             <!-- Attribute cards will be dynamically inserted here -->
@@ -41,77 +43,63 @@
         </div>
         
         <!-- Completed Quests Section (collapsed by default) -->
-        <h2 class="section-title collapsed" onclick="toggleCompletedQuests()">
-    Completed Quests <span class="toggle-icon">+</span>
-</h2>
-<div id="completed-quests-section" class="quest-cards hidden">
-    <!-- Completed quests will be dynamically inserted here -->
-</div>
-    </div>
-    
-    <!-- Quest Detail Modal -->
-    <div id="quest-detail-modal" class="quest-detail-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-title">Quest Details</h2>
-                <button class="close-button" onclick="closeQuestDetail()">×</button>
-            </div>
-            
-            <div id="modal-content">
-                <!-- Quest details will be dynamically inserted here -->
-            </div>
+        <h2 class="section-title collapsed" onclick="toggleSection('completed-quests-section')">
+            Completed Quests <span class="toggle-icon">+</span>
+        </h2>
+        <div id="completed-quests-section" class="quest-cards hidden">
+            <!-- Completed quests will be dynamically inserted here -->
         </div>
     </div>
     
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-        <a href="#" class="nav-tab active" data-tab="quests">
-            <div class="tab-icon">📋</div>
-            Quests
-        </a>
-        <a href="#" class="nav-tab" data-tab="progress">
-            <div class="tab-icon">📊</div>
-            Progress
-        </a>
-        <a href="#" class="nav-tab" data-tab="skills">
-            <div class="tab-icon">🍳</div>
-            Skills
-        </a>
-        <a href="#" class="nav-tab" data-tab="journal">
-            <div class="tab-icon">📝</div>
-            Journal
-        </a>
-    </nav>
-
-    <!-- Success Notification -->
-    <div id="notification" class="notification hidden">
-        <div class="notification-content">
-            <span id="notification-message">Quest completed successfully!</span>
-            <button class="close-button" onclick="hideNotification()">×</button>
-        </div>
+    <!-- Progress Tab Content -->
+    <div id="progress-tab" class="tab-content hidden">
+        <h2 class="section-title">Progress Tracking</h2>
+        <p>Progress tracking features will be added in a future update.</p>
     </div>
-
-    <!-- Skills Tab -->
+    
+    <!-- Skills Tab Content -->
     <div id="skills-tab" class="tab-content hidden">
-    <h2 class="section-title">Cooking Techniques</h2>
-    <div class="category-filters">
-        <!-- Category filter buttons will be added dynamically -->
+        <h2 class="section-title">Cooking Techniques</h2>
+        <div class="category-filters">
+            <!-- Category filter buttons will be added dynamically -->
+        </div>
+        
+        <div id="skills-container">
+            <!-- Skills will be rendered here -->
+        </div>
     </div>
     
-    <div id="skills-container">
-        <!-- Skills will be rendered here -->
+    <!-- Journal Tab Content -->
+    <div id="journal-tab" class="tab-content hidden">
+        <h2 class="section-title">Cooking Journal</h2>
+        <p>Journal features will be added in a future update.</p>
     </div>
-    
-    <div id="skill-detail-modal" class="quest-detail-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="skill-modal-title">Skill Details</h2>
-                <button class="close-button" onclick="closeSkillDetail()">×</button>
-            </div>
-            
-            <div id="skill-modal-content">
-                <!-- Skill details will be dynamically inserted here -->
-            </div>
+</div>
+
+<!-- Quest Detail Modal -->
+<div id="quest-detail-modal" class="quest-detail-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Quest Details</h2>
+            <button class="close-button" onclick="closeQuestDetail()">×</button>
+        </div>
+        
+        <div id="modal-content">
+            <!-- Quest details will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Skill Detail Modal -->
+<div id="skill-detail-modal" class="quest-detail-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="skill-modal-title">Skill Details</h2>
+            <button class="close-button" onclick="closeSkillDetail()">×</button>
+        </div>
+        
+        <div id="skill-modal-content">
+            <!-- Skill details will be dynamically inserted here -->
         </div>
     </div>
 </div>
