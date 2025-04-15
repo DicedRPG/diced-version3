@@ -91,6 +91,31 @@
         </div>
     </div>
 
+    <!-- Skills Tab -->
+    <div id="skills-tab" class="tab-content hidden">
+    <h2 class="section-title">Cooking Techniques</h2>
+    <div class="category-filters">
+        <!-- Category filter buttons will be added dynamically -->
+    </div>
+    
+    <div id="skills-container">
+        <!-- Skills will be rendered here -->
+    </div>
+    
+    <div id="skill-detail-modal" class="quest-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="skill-modal-title">Skill Details</h2>
+                <button class="close-button" onclick="closeSkillDetail()">×</button>
+            </div>
+            
+            <div id="skill-modal-content">
+                <!-- Skill details will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Add this script at the end of your index.html, just before the closing </body> tag -->
 <!-- Add this script at the end of your index.html, replacing any previously added scripts -->
 <script>
@@ -178,5 +203,6 @@
     <script src="js/quests.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/skills.js"></script>
 </body>
 </html>
