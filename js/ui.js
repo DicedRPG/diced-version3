@@ -24,7 +24,10 @@ const UIManager = (() => {
         
         // Notification
         notification: document.getElementById('notification'),
-        notificationMessage: document.getElementById('notification-message')
+        notificationMessage: document.getElementById('notification-message'),
+        
+        // Skills tab
+        skillsContainer: document.getElementById('skills-container')
     };
     
     /**
@@ -42,77 +45,56 @@ const UIManager = (() => {
         // Initialize the main quest sections
         renderQuestSections(userProfile, quests);
         
+        // Initialize tabs
+        initializeTabs();
+        
         // Set up event listeners
         setupEventListeners();
+    }
+    
+    /**
+     * Initialize tab navigation
+     */
+    function initializeTabs() {
+        // Set the initial active tab
+        const activeTab = document.querySelector('.nav-tab.active');
+        if (activeTab) {
+            const tabName = activeTab.getAttribute('data-tab');
+            const tabContent = document.getElementById(`${tabName}-tab`);
+            
+            if (tabContent) {
+                tabContent.classList.add('active');
+                tabContent.classList.remove('hidden');
+            }
+        }
     }
     
     /**
      * Set up event listeners for UI interactions
      */
     function setupEventListeners() {
-    console.log('Setting up event listeners');
-    
-    // Tab navigation
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', handleTabClick);
-    });
-    
-    // Section toggles - IMPORTANT: Use this approach instead of inline onclick attributes
-    document.querySelectorAll('.section-title.collapsed').forEach(title => {
-        // Remove any existing onclick attribute to prevent double-firing
-        title.removeAttribute('onclick');
+        console.log('Setting up event listeners');
         
-        // Add click event listener
-        title.addEventListener('click', function() {
-            // Get the section ID from the data attribute
-            const sectionId = this.getAttribute('data-section');
-            if (sectionId) {
-                toggleSection(sectionId);
-            }
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', handleTabClick);
         });
-    });
-}
-
-/**
- * Toggle a collapsible section
- * @param {string} sectionId - The section ID
- */
-function toggleSection(sectionId) {
-    // Get the section to toggle
-    const section = document.getElementById(sectionId);
-    if (!section) {
-        console.error('Section not found:', sectionId);
-        return;
-    }
-
-    // Toggle visibility
-    const isHidden = section.classList.contains('hidden');
-    console.log('Current state - hidden:', isHidden);
-    
-    if (isHidden) {
-        section.classList.remove('hidden');
-        console.log('Showing section');
-    } else {
-        section.classList.add('hidden');
-        console.log('Hiding section');
-    }
-    
-    // Try to find and update the toggle icon
-    try {
-        // Get the button that was clicked (has the onclick attribute)
-        const buttons = document.querySelectorAll('.section-title');
-        buttons.forEach(button => {
-            if (button.getAttribute('onclick')?.includes(sectionId)) {
-                const icon = button.querySelector('.toggle-icon');
-                if (icon) {
-                    icon.textContent = isHidden ? '−' : '+';
+        
+        // Section toggles - IMPORTANT: Use this approach instead of inline onclick attributes
+        document.querySelectorAll('.section-title.collapsed').forEach(title => {
+            // Remove any existing onclick attribute to prevent double-firing
+            title.removeAttribute('onclick');
+            
+            // Add click event listener
+            title.addEventListener('click', function() {
+                // Get the section ID from the data attribute
+                const sectionId = this.getAttribute('data-section');
+                if (sectionId) {
+                    toggleSection(sectionId);
                 }
-            }
+            });
         });
-    } catch (e) {
-        console.log('Could not update icon, but section was toggled');
     }
-}
     
     /**
      * Handle tab navigation clicks
@@ -129,11 +111,28 @@ function toggleSection(sectionId) {
         // Add active class to clicked tab
         event.currentTarget.classList.add('active');
         
-        // Handle tab switching logic here
-        const tabName = event.currentTarget.getAttribute('data-tab');
-        console.log(`Switching to ${tabName} tab`);
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+            content.classList.add('hidden');
+        });
         
-        // Future implementation for tab switching
+        // Show selected tab content
+        const tabName = event.currentTarget.getAttribute('data-tab');
+        const tabContent = document.getElementById(`${tabName}-tab`);
+        
+        if (tabContent) {
+            tabContent.classList.add('active');
+            tabContent.classList.remove('hidden');
+            
+            // Special handling for skills tab
+            if (tabName === 'skills') {
+                const userProfile = DataManager.getUserProfile();
+                renderSkillsTab(userProfile);
+            }
+        }
+        
+        console.log(`Switched to ${tabName} tab`);
     }
     
     /**
@@ -288,33 +287,33 @@ function toggleSection(sectionId) {
      * @returns {string} - HTML for rewards
      */
     function createRewardsHtml(rewards) {
-    // Check if all attributes have the same value
-    const values = Object.values(rewards).filter(val => val > 0);
-    const allSame = values.every(val => val === values[0]);
-    
-    // Only use "All Attributes" if ALL four attributes have the same non-zero value
-    if (allSame && values.length === 4 && values[0] > 0) {
-        return `<span class="reward-pill all-attributes-reward">All Attributes +${values[0]}</span>`;
-    }
-    
-    // For the case where multiple (but not all) attributes have the same value
-    if (allSame && values.length > 1 && values.length < 4) {
-        // Get attribute names with non-zero values
-        const attrNames = Object.entries(rewards)
-            .filter(([_, val]) => val > 0)
-            .map(([name, _]) => name.charAt(0).toUpperCase() + name.slice(1));
+        // Check if all attributes have the same value
+        const values = Object.values(rewards).filter(val => val > 0);
+        const allSame = values.every(val => val === values[0]);
         
-        return `<span class="reward-pill all-attributes-reward">${attrNames.join(' & ')} +${values[0]}</span>`;
+        // Only use "All Attributes" if ALL four attributes have the same non-zero value
+        if (allSame && values.length === 4 && values[0] > 0) {
+            return `<span class="reward-pill all-attributes-reward">All Attributes +${values[0]}</span>`;
+        }
+        
+        // For the case where multiple (but not all) attributes have the same value
+        if (allSame && values.length > 1 && values.length < 4) {
+            // Get attribute names with non-zero values
+            const attrNames = Object.entries(rewards)
+                .filter(([_, val]) => val > 0)
+                .map(([name, _]) => name.charAt(0).toUpperCase() + name.slice(1));
+            
+            return `<span class="reward-pill all-attributes-reward">${attrNames.join(' & ')} +${values[0]}</span>`;
+        }
+        
+        // Otherwise, create individual pills
+        return Object.entries(rewards)
+            .filter(([_, value]) => value > 0)
+            .map(([attr, value]) => 
+                `<span class="reward-pill ${attr}-reward">${attr.charAt(0).toUpperCase() + attr.slice(1)} +${value}</span>`
+            )
+            .join('');
     }
-    
-    // Otherwise, create individual pills
-    return Object.entries(rewards)
-        .filter(([_, value]) => value > 0)
-        .map(([attr, value]) => 
-            `<span class="reward-pill ${attr}-reward">${attr.charAt(0).toUpperCase() + attr.slice(1)} +${value}</span>`
-        )
-        .join('');
-}
     
     /**
      * Open the quest detail modal
@@ -463,6 +462,9 @@ function toggleSection(sectionId) {
             updateRankDisplay(userProfile);
             renderAttributesDashboard(userProfile);
             
+            // Check if quest unlocks any skills
+            updateQuestCompletionWithSkills(currentQuest.id, userProfile);
+            
             // Get all quests
             const quests = await DataManager.getQuestData();
             
@@ -484,6 +486,40 @@ function toggleSection(sectionId) {
                 completeButton.textContent = 'Mark as Complete';
             }
         }
+    }
+    
+    /**
+     * Update quest completion with skills
+     * @param {string} questId - Quest ID
+     * @param {Object} userProfile - User profile
+     */
+    function updateQuestCompletionWithSkills(questId, userProfile) {
+        // Get the quest
+        DataManager.getQuestData().then(quests => {
+            const quest = quests.find(q => q.id === questId);
+            
+            if (!quest) return;
+            
+            // Check if quest unlocks any techniques
+            if (quest.techniquesLearned && Array.isArray(quest.techniquesLearned)) {
+                quest.techniquesLearned.forEach(technique => {
+                    // Don't add duplicates
+                    if (!userProfile.masteredTechniques.includes(technique)) {
+                        userProfile.masteredTechniques.push(technique);
+                        
+                        // Get technique name for notification
+                        const techniques = SkillsManager.getAllTechniques();
+                        const techName = techniques[technique]?.name || technique;
+                        
+                        // Show notification
+                        showNotification(`New skill unlocked: ${techName}`);
+                    }
+                });
+                
+                // Save user profile
+                DataManager.saveUserProfile();
+            }
+        });
     }
     
     /**
@@ -543,35 +579,35 @@ function toggleSection(sectionId) {
      * @param {string} sectionId - The section ID
      */
     function toggleSection(sectionId) {
-    console.log('Toggle section called for:', sectionId); // Debug log
-    
-    const section = document.getElementById(sectionId);
-    const title = document.querySelector(`[onclick*="toggleSection('${sectionId}')"]`);
-    
-    if (!section) {
-        console.error('Section element not found:', sectionId);
-        return;
+        console.log('Toggle section called for:', sectionId); // Debug log
+        
+        const section = document.getElementById(sectionId);
+        const title = document.querySelector(`[data-section="${sectionId}"]`);
+        
+        if (!section) {
+            console.error('Section element not found:', sectionId);
+            return;
+        }
+        
+        if (!title) {
+            console.error('Title element not found for section:', sectionId);
+            return;
+        }
+        
+        // Toggle the hidden class on the section
+        section.classList.toggle('hidden');
+        
+        // Toggle the collapsed class on the title
+        title.classList.toggle('collapsed');
+        
+        // Update the toggle icon
+        const toggleIcon = title.querySelector('.toggle-icon');
+        if (toggleIcon) {
+            toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
+        }
+        
+        console.log('Section toggled. Hidden:', section.classList.contains('hidden')); // Debug log
     }
-    
-    if (!title) {
-        console.error('Title element not found for section:', sectionId);
-        return;
-    }
-    
-    // Toggle the hidden class on the section
-    section.classList.toggle('hidden');
-    
-    // Toggle the collapsed class on the title
-    title.classList.toggle('collapsed');
-    
-    // Update the toggle icon
-    const toggleIcon = title.querySelector('.toggle-icon');
-    if (toggleIcon) {
-        toggleIcon.textContent = section.classList.contains('hidden') ? '+' : '−';
-    }
-    
-    console.log('Section toggled. Hidden:', section.classList.contains('hidden')); // Debug log
-}
     
     /**
      * Refresh the UI with updated data
@@ -587,16 +623,371 @@ function toggleSection(sectionId) {
         renderQuestSections(userProfile, quests);
     }
     
+    // ======================================================================
+    // SKILLS UI FUNCTIONS
+    // ======================================================================
+    
+    /**
+     * Render the skills tab
+     * @param {Object} userProfile - The user profile
+     */
+    function renderSkillsTab(userProfile) {
+        // Get the skills container
+        const skillsContainer = document.getElementById('skills-container');
+        if (!skillsContainer) return;
+        
+        // Clear existing content
+        skillsContainer.innerHTML = '';
+        
+        // Get skill tree data
+        const skillTreeData = SkillsManager.generateSkillTreeData(userProfile);
+        
+        // Render category filters
+        renderCategoryFilters(Object.keys(skillTreeData));
+        
+        // Render each category
+        Object.entries(skillTreeData).forEach(([categoryName, categoryData]) => {
+            const categorySection = document.createElement('div');
+            categorySection.className = 'skill-category';
+            categorySection.id = `category-${categoryName.toLowerCase().replace(/\s+/g, '-')}`;
+            
+            // Create category header
+            const categoryHeader = document.createElement('div');
+            categoryHeader.className = 'category-header';
+            categoryHeader.innerHTML = `
+                <span class="category-icon">${categoryData.icon}</span>
+                <h3 class="category-name">${categoryName}</h3>
+            `;
+            
+            categorySection.appendChild(categoryHeader);
+            
+            // Create difficulty sections
+            Object.entries(categoryData.skills).forEach(([difficulty, skills]) => {
+                if (skills.length === 0) return;
+                
+                const difficultySection = document.createElement('div');
+                difficultySection.className = 'difficulty-section';
+                
+                // Difficulty title
+                const difficultyTitle = document.createElement('h4');
+                difficultyTitle.className = 'difficulty-title';
+                difficultyTitle.textContent = `${difficulty}`;
+                difficultySection.appendChild(difficultyTitle);
+                
+                // Create skill tree
+                const skillTree = document.createElement('div');
+                skillTree.className = 'skill-tree';
+                
+                // Add skills to tree
+                skills.forEach(skill => {
+                    const skillNode = document.createElement('div');
+                    skillNode.className = `skill-node ${skill.mastered ? 'mastered' : skill.available ? 'available' : 'locked'}`;
+                    skillNode.setAttribute('data-skill-id', skill.id);
+                    
+                    skillNode.innerHTML = `
+                        <div class="skill-icon">${skill.icon}</div>
+                        <div class="skill-name">${skill.name}</div>
+                        ${skill.mastered ? '<div class="mastery-badge">✓</div>' : ''}
+                    `;
+                    
+                    // Add click handler for skill details
+                    if (!skill.locked) {
+                        skillNode.addEventListener('click', () => openSkillDetail(skill.id, userProfile));
+                    }
+                    
+                    skillTree.appendChild(skillNode);
+                });
+                
+                difficultySection.appendChild(skillTree);
+                categorySection.appendChild(difficultySection);
+            });
+            
+            skillsContainer.appendChild(categorySection);
+        });
+        
+        // Create connections between skills
+        createSkillConnections(userProfile);
+    }
+    
+    /**
+     * Render category filter buttons
+     * @param {Array} categories - Category names
+     */
+    function renderCategoryFilters(categories) {
+        const filterContainer = document.querySelector('.category-filters');
+        if (!filterContainer) return;
+        
+        // Clear existing filters
+        filterContainer.innerHTML = '';
+        
+        // Add "All" filter
+        const allFilter = document.createElement('button');
+        allFilter.className = 'category-filter active';
+        allFilter.textContent = 'All';
+        allFilter.addEventListener('click', () => filterSkillsByCategory('all'));
+        filterContainer.appendChild(allFilter);
+        
+        // Add category filters
+        categories.forEach(category => {
+            const filter = document.createElement('button');
+            filter.className = 'category-filter';
+            filter.textContent = category;
+            filter.addEventListener('click', () => filterSkillsByCategory(category));
+            filterContainer.appendChild(filter);
+        });
+    }
+    
+    /**
+     * Filter skills by category
+     * @param {string} category - Category to filter by
+     */
+    function filterSkillsByCategory(category) {
+        // Update active filter
+        document.querySelectorAll('.category-filter').forEach(filter => {
+            filter.classList.toggle('active', filter.textContent === category || (category === 'all' && filter.textContent === 'All'));
+        });
+        
+        // Show/hide categories
+        document.querySelectorAll('.skill-category').forEach(categorySection => {
+            if (category === 'all') {
+                categorySection.style.display = 'block';
+            } else {
+                const categoryName = categorySection.querySelector('.category-name').textContent;
+                categorySection.style.display = categoryName === category ? 'block' : 'none';
+            }
+        });
+    }
+    
+    /**
+     * Create visual connections between prerequisite skills
+     * @param {Object} userProfile - The user profile
+     */
+    function createSkillConnections(userProfile) {
+        // Get all technique data
+        const techniques = SkillsManager.getAllTechniques();
+        
+        // Process each technique
+        Object.entries(techniques).forEach(([id, technique]) => {
+            if (!technique.prerequisites || technique.prerequisites.length === 0) return;
+            
+            // Get the skill node
+            const skillNode = document.querySelector(`.skill-node[data-skill-id="${id}"]`);
+            if (!skillNode) return;
+            
+            // Create connections to each prerequisite
+            technique.prerequisites.forEach(prereqId => {
+                const prereqNode = document.querySelector(`.skill-node[data-skill-id="${prereqId}"]`);
+                if (!prereqNode) return;
+                
+                // Create connection line
+                createConnectionLine(
+                    prereqNode, 
+                    skillNode, 
+                    SkillsManager.isTechniqueMastered(prereqId, userProfile)
+                );
+            });
+        });
+    }
+    
+    /**
+     * Create a visual connection line between two skill nodes
+     * @param {HTMLElement} fromNode - Starting node
+     * @param {HTMLElement} toNode - Ending node
+     * @param {boolean} mastered - Whether the prerequisite is mastered
+     */
+    function createConnectionLine(fromNode, toNode, mastered) {
+        // Get positions
+        const fromRect = fromNode.getBoundingClientRect();
+        const toRect = toNode.getBoundingClientRect();
+        
+        // Calculate positions relative to skills container
+        const containerRect = document.getElementById('skills-container').getBoundingClientRect();
+        
+        const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+        const fromY = fromRect.top + fromRect.height - containerRect.top;
+        const toX = toRect.left + toRect.width / 2 - containerRect.left;
+        const toY = toRect.top - containerRect.top;
+        
+        // Create connection element
+        const connection = document.createElement('div');
+        connection.className = `skill-connection ${mastered ? 'mastered' : ''}`;
+        
+        // Calculate length and angle
+        const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+        const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+        
+        // Set position and dimensions
+        connection.style.width = `${length}px`;
+        connection.style.height = '2px';
+        connection.style.left = `${fromX}px`;
+        connection.style.top = `${fromY}px`;
+        connection.style.transform = `rotate(${angle}deg)`;
+        connection.style.transformOrigin = '0 0';
+        
+        // Add to container
+        document.getElementById('skills-container').appendChild(connection);
+    }
+    
+    /**
+     * Open skill detail modal
+     * @param {string} skillId - Skill ID to display
+     * @param {Object} userProfile - User profile
+     */
+    function openSkillDetail(skillId, userProfile) {
+        // Get skill data
+        const techniques = SkillsManager.getAllTechniques();
+        const skill = techniques[skillId];
+        
+        if (!skill) {
+            console.error(`Skill not found: ${skillId}`);
+            return;
+        }
+        
+        // Set modal title
+        document.getElementById('skill-modal-title').textContent = skill.name;
+        
+        // Get mastered and available status
+        const isMastered = SkillsManager.isTechniqueMastered(skillId, userProfile);
+        const isAvailable = SkillsManager.isTechniqueAvailable(skillId, userProfile);
+        
+        // Generate prerequisites HTML
+        let prerequisitesHtml = '';
+        if (skill.prerequisites && skill.prerequisites.length > 0) {
+            prerequisitesHtml = `
+                <h3>Prerequisites:</h3>
+                <ul class="prerequisites-list">
+                    ${skill.prerequisites.map(prereqId => {
+                        const prereq = techniques[prereqId];
+                        const completed = SkillsManager.isTechniqueMastered(prereqId, userProfile);
+                        return `
+                            <li class="prerequisite-item">
+                                <div class="prerequisite-icon ${completed ? 'completed' : 'missing'}">
+                                    ${completed ? '✓' : ''}
+                                </div>
+                                ${prereq ? prereq.name : prereqId}
+                            </li>
+                        `;
+                    }).join('')}
+                </ul>
+            `;
+        }
+        
+        // Generate unlocked by HTML
+        let unlockedByHtml = '';
+        if (skill.unlockedBy && skill.unlockedBy.length > 0) {
+            // Get quest data to get quest names
+            DataManager.getQuestData().then(quests => {
+                const questMap = {};
+                quests.forEach(quest => {
+                    questMap[quest.id] = quest;
+                });
+                
+                unlockedByHtml = `
+                    <h3>Unlocked by Quests:</h3>
+                    <ul class="quests-list">
+                        ${skill.unlockedBy.map(questId => {
+                            const quest = questMap[questId];
+                            return `<li>${quest ? quest.title : questId}</li>`;
+                        }).join('')}
+                    </ul>
+                `;
+                
+                // Complete the modal content with quest info
+                completeModalContent();
+            });
+        } else {
+            // Complete the modal content without quest info
+            completeModalContent();
+        }
+        
+        function completeModalContent() {
+            // Set modal content
+            document.getElementById('skill-modal-content').innerHTML = `
+                <p><strong>Category:</strong> ${skill.category}</p>
+                <p><strong>Difficulty:</strong> ${skill.difficulty}</p>
+                <p><strong>Description:</strong> ${skill.description}</p>
+                
+                ${prerequisitesHtml}
+                ${unlockedByHtml}
+                
+                ${isMastered 
+                    ? '<p class="success-message"><strong>✓ You have mastered this skill!</strong></p>' 
+                    : isAvailable
+                        ? '<button id="learn-skill-button" class="skill-learn-button">Learn Skill</button>'
+                        : '<p class="locked-message">This skill is not yet available. Complete the prerequisites first.</p>'
+                }
+            `;
+            
+            // Add event listener to learn button if available
+            const learnButton = document.getElementById('learn-skill-button');
+            if (learnButton) {
+                learnButton.addEventListener('click', () => {
+                    learnSkill(skillId, userProfile);
+                });
+            }
+        }
+        
+        // Show the modal
+        document.getElementById('skill-detail-modal').style.display = 'flex';
+    }
+    
+    /**
+     * Close skill detail modal
+     */
+    function closeSkillDetail() {
+        document.getElementById('skill-detail-modal').style.display = 'none';
+    }
+    
+    /**
+     * Learn a new skill
+     * @param {string} skillId - Skill ID to learn
+     * @param {Object} userProfile - User profile
+     */
+    function learnSkill(skillId, userProfile) {
+        // Check if skill is available
+        if (!SkillsManager.isTechniqueAvailable(skillId, userProfile)) {
+            console.error(`Skill not available: ${skillId}`);
+            return;
+        }
+        
+        // Get skill data
+        const techniques = SkillsManager.getAllTechniques();
+        const skill = techniques[skillId];
+        
+        // Add to mastered techniques
+        if (!userProfile.masteredTechniques.includes(skillId)) {
+            userProfile.masteredTechniques.push(skillId);
+            
+            // Save user profile
+            DataManager.saveUserProfile();
+            
+            // Close the modal
+            closeSkillDetail();
+            
+            // Show notification
+            showNotification(`Skill mastered: ${skill.name}`);
+            
+            // Refresh skills tab
+            renderSkillsTab(userProfile);
+        }
+    }
+    
     // Define global functions needed by HTML
     window.openQuestDetail = openQuestDetail;
     window.closeQuestDetail = closeQuestDetail;
     window.toggleSection = toggleSection;
     window.hideNotification = hideNotification;
+    window.openSkillDetail = function(skillId) {
+        const userProfile = DataManager.getUserProfile();
+        openSkillDetail(skillId, userProfile);
+    };
+    window.closeSkillDetail = closeSkillDetail;
     
     // Public API
     return {
         initialize,
         refreshUI,
-        showNotification
+        showNotification,
+        renderSkillsTab
     };
 })();
