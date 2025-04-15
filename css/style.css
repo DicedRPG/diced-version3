@@ -332,7 +332,7 @@
         }
         
         .complete-button {
-            background-color: var(--accent-color);
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 0.5rem;
