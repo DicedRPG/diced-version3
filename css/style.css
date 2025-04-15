@@ -26,6 +26,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             /*background-color: var(--background-color);*/
+            background-color: rgba(247, 244, 236, 0.85);  /* Your background color with alpha transparency */
             background-image: url('../src/header-bg.jpg');
             background-size: cover;  /* This stretches the image to cover the entire viewport */
             background-position: center;  /* Centers the image */
@@ -63,7 +64,7 @@
         
         .main-content {
             margin-top: calc(var(--header-height) + 20px);
-            background-color: rgba(247, 244, 236, 0.85);  /* Your background color with alpha transparency */
+            /*background-color: rgba(247, 244, 236, 0.85);  /* Your background color with alpha transparency */ */
             padding: 1rem;
             max-width: 800px;
             margin-left: auto;
