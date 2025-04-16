@@ -43,8 +43,10 @@
             color: var(--light-color);
             padding: 1rem;
             text-align: center;
-            position: fixed;
-            width: 100%;
+            /* position: fixed; */
+            /* width: 100%; */
+            max-width: 800px;
+            border-radius: 0.5rem;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
