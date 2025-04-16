@@ -92,9 +92,8 @@
         }
 
 
-            .technique-card {
-                        border: 10px;
-                        border-color: var(--primary-color);
+            .technique-border {
+                         border: 2px solid var(--accent-color-1);
             }
         
         .attribute-title {
