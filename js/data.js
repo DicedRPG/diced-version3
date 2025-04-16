@@ -2,6 +2,8 @@
  * data.js - Handles all data loading, caching, and storage functionality
  * This file manages the application's data layer, handling fetching quest data 
  * from the server and managing local storage for user progress.
+ * 
+ * MODIFIED: Integration with ProgressManager
  */
 
 // Data manager namespace
@@ -279,13 +281,19 @@ const DataManager = (() => {
         
         userProfile.attributes[attribute].totalHours += hours;
         
-        // Calculate progress percentage to next level
-        const totalHours = userProfile.attributes[attribute].totalHours;
-        const nextLevelAt = userProfile.attributes[attribute].hoursToNextLevel;
-        const progressPercentage = (totalHours / nextLevelAt) * 100;
+        // Calculate progress percentage using ProgressManager
+        const attrData = userProfile.attributes[attribute];
+        const rankTitle = userProfile.currentRank.title;
+        const previousLevelHours = ProgressManager.calculateHoursToLevel(
+            rankTitle, 
+            attrData.currentLevel - 1
+        );
         
-        userProfile.attributes[attribute].progressPercentage = 
-            progressPercentage > 100 ? 100 : progressPercentage;
+        attrData.progressPercentage = ProgressManager.calculateLevelProgress(
+            attrData.totalHours,
+            previousLevelHours,
+            attrData.hoursToNextLevel
+        );
         
         // Check for level up
         checkForLevelUp();
@@ -298,30 +306,14 @@ const DataManager = (() => {
     
     /**
      * Check if any attributes have leveled up
+     * MODIFIED: Now uses ProgressManager for level and rank progression
      */
     function checkForLevelUp() {
         const userProfile = loadUserProfile();
         const currentRank = userProfile.currentRank.title;
         
-        // Define the rank progression system
-        const rankProgression = {
-            "Home Cook": {
-                color: "Bronze",
-                levels: 10,
-                hoursPerLevel: [20, 5, 5, 5, 5, 6, 7, 8, 9, 10], // Hours needed for each level
-                totalHours: 80,
-                nextRank: "Culinary Student"
-            },
-            "Culinary Student": {
-                color: "Iron",
-                levels: 10,
-                hoursPerLevel: [10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
-                totalHours: 325,
-                nextRank: "Kitchen Assistant"
-            }
-        };
-        
-        const rankInfo = rankProgression[currentRank];
+        // Use ProgressManager's rank progression
+        const rankInfo = ProgressManager.RANK_PROGRESSION[currentRank];
         
         if (!rankInfo) {
             console.error(`Rank information not found for ${currentRank}`);
@@ -331,12 +323,9 @@ const DataManager = (() => {
         // Check each attribute for level up
         Object.keys(userProfile.attributes).forEach(attr => {
             const attribute = userProfile.attributes[attr];
-            const currentLevel = attribute.currentLevel;
             
-            // If we've reached the hours needed for next level
-            if (currentLevel <= rankInfo.levels && 
-                attribute.totalHours >= attribute.hoursToNextLevel) {
-                
+            // Use ProgressManager to check if can level up
+            if (ProgressManager.canLevelUp(attribute, currentRank)) {
                 // Level up the attribute
                 attribute.currentLevel += 1;
                 
@@ -351,15 +340,11 @@ const DataManager = (() => {
             }
         });
         
-        // Check if all attributes have reached the max level for this rank
-        const allMaxLevel = Object.values(userProfile.attributes).every(
-            attr => attr.currentLevel > rankInfo.levels
-        );
-        
-        if (allMaxLevel) {
+        // Use ProgressManager to check if can rank up
+        if (ProgressManager.canRankUp(userProfile)) {
             // Rank up!
             userProfile.currentRank.title = rankInfo.nextRank;
-            userProfile.currentRank.color = rankProgression[rankInfo.nextRank].color;
+            userProfile.currentRank.color = ProgressManager.RANK_PROGRESSION[rankInfo.nextRank].color;
             userProfile.currentRank.level = 1;
             
             // Reset level-specific values for the new rank
@@ -367,7 +352,7 @@ const DataManager = (() => {
                 const attribute = userProfile.attributes[attr];
                 attribute.currentLevel = 1;
                 attribute.hoursToNextLevel = attribute.totalHours + 
-                    rankProgression[rankInfo.nextRank].hoursPerLevel[0];
+                    ProgressManager.RANK_PROGRESSION[rankInfo.nextRank].hoursPerLevel[0];
                 attribute.progressPercentage = 0;
             });
         } else {
@@ -423,57 +408,3 @@ const DataManager = (() => {
         
         return { success: true, message: "Journal entry added" };
     }
-    
-    /**
-     * Get recommended quests based on current progress
-     * @param {number} count - Number of quests to recommend
-     * @returns {Promise<Array>} - Promise resolving to array of recommended quests
-     */
-    async function getRecommendedQuests(count = 3) {
-        const userProfile = loadUserProfile();
-        const quests = await getQuestData();
-        
-        // Find attributes with lowest progress
-        const attributesByProgress = Object.entries(userProfile.attributes)
-            .sort((a, b) => a[1].totalHours - b[1].totalHours)
-            .map(entry => entry[0]);
-        
-        const lowestAttribute = attributesByProgress[0];
-        
-        // Get unlocked but not completed quests
-        const availableQuests = userProfile.unlockedQuests
-            .filter(id => !userProfile.completedQuests.includes(id))
-            .map(id => quests.find(q => q.id === id))
-            .filter(q => q !== undefined);
-        
-        // Sort quests by reward for lowest attribute
-        const sortedQuests = availableQuests.sort((a, b) => {
-            return b.attributeRewards[lowestAttribute] - a.attributeRewards[lowestAttribute];
-        });
-        
-        return sortedQuests.slice(0, count);
-    }
-    
-    // Public API
-    return {
-        initialize: async function() {
-            // Load user profile first
-            loadUserProfile();
-            
-            // Then pre-fetch quest data
-            await getQuestData();
-            
-            return {
-                userProfile: dataStore.userProfile,
-                questData: dataStore.questData
-            };
-        },
-        getUserProfile: loadUserProfile,
-        getQuestData: getQuestData,
-        completeQuest: completeQuest,
-        updateAttribute: updateAttribute,
-        addJournalEntry: addJournalEntry,
-        getRecommendedQuests: getRecommendedQuests,
-        resetUserProgress: resetUserProgress  // For testing/debugging
-    };
-})();
