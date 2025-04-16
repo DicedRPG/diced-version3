@@ -162,7 +162,7 @@ const UIManager = (() => {
             const attrData = userProfile.attributes[attr];
             
             const attrCard = document.createElement('div');
-            attrCard.className = 'attribute-card';
+            attrCard.className = 'attribute-card technique-border';
             
             const percentage = attrData.progressPercentage || 0;
             
