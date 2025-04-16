@@ -93,19 +93,19 @@
 
 
             .technique-border {
-                         border: 2px solid var(--accent-color-3);
+                         border: 2px solid var(--technique-color);
             }
 
             .ingredients-border {
-                         border: 2px solid var(--primary-color);
+                         border: 2px solid var(--ingredients-color);
             }
 
             .flavor-border {
-                         border: 2px solid var(--accent-color-2);
+                         border: 2px solid var(--flavor-color);
             }
 
             .management-border {
-                         border: 2px solid var(--accent-color-1);
+                         border: 2px solid var(--management-color);
             }
         
         .attribute-title {
@@ -204,6 +204,18 @@
 
             .training-quest-border {
                         border: 2px solid var(--primary-color);
+            }
+
+             .side-quest-border {
+                        border: 2px solid var(--flavor-color);
+            }
+
+             .main-quest-border {
+                        border: 2px solid var(--management-color);
+            }
+
+             .explore-quest-border {
+                        border: 2px solid var(--technique-color);
             }
         
         .quest-card:hover {
