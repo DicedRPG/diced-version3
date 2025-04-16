@@ -48,7 +48,8 @@
             max-width: 800px;
             left: 50%;
             transform: translateX(-50%);
-            border-bottom-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
