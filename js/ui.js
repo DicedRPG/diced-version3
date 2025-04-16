@@ -287,33 +287,14 @@ const UIManager = (() => {
      * @returns {string} - HTML for rewards
      */
     function createRewardsHtml(rewards) {
-        // Check if all attributes have the same value
-        const values = Object.values(rewards).filter(val => val > 0);
-        const allSame = values.every(val => val === values[0]);
-        
-        // Only use "All Attributes" if ALL four attributes have the same non-zero value
-        if (allSame && values.length === 4 && values[0] > 0) {
-            return `<span class="reward-pill all-attributes-reward">All Attributes +${values[0]}</span>`;
-        }
-        
-        // For the case where multiple (but not all) attributes have the same value
-        if (allSame && values.length > 1 && values.length < 4) {
-            // Get attribute names with non-zero values
-            const attrNames = Object.entries(rewards)
-                .filter(([_, val]) => val > 0)
-                .map(([name, _]) => name.charAt(0).toUpperCase() + name.slice(1));
-            
-            return `<span class="reward-pill all-attributes-reward">${attrNames.join(' & ')} +${values[0]}</span>`;
-        }
-        
-        // Otherwise, create individual pills
-        return Object.entries(rewards)
-            .filter(([_, value]) => value > 0)
-            .map(([attr, value]) => 
-                `<span class="reward-pill ${attr}-reward">${attr.charAt(0).toUpperCase() + attr.slice(1)} +${value}</span>`
-            )
-            .join('');
-    }
+    // Always create individual pills for each attribute with a value > 0
+    return Object.entries(rewards)
+        .filter(([_, value]) => value > 0)
+        .map(([attr, value]) => 
+            `<span class="reward-pill ${attr}-reward">${attr.charAt(0).toUpperCase() + attr.slice(1)} +${value}</span>`
+        )
+        .join('');
+}
     
     /**
      * Open the quest detail modal
