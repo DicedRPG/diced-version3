@@ -46,7 +46,8 @@
             position: fixed;
             width: 100%;
             max-width: 800px;
-            margin-left: 50px;
+            margin-left: 0 auto;
+            margin-right: 0 auto;
             border-radius: 0.5rem;
             top: 0;
             z-index: 100;
