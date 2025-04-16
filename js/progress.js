@@ -10,16 +10,16 @@ const ProgressManager = (() => {
     const RANK_PROGRESSION = {
         "Home Cook": {
             color: "Bronze",
-            levels: 10,
-            hoursPerLevel: [20, 5, 5, 5, 5, 6, 7, 8, 9, 10], // Hours needed for each level
-            totalHours: 80,
+            levels: 9,
+            hoursPerLevel: [5, 5, 5, 5, 5, 6, 7, 8, 9], // Hours needed for each level
+            totalHours: 55,
             nextRank: "Culinary Student"
         },
         "Culinary Student": {
             color: "Iron",
-            levels: 10,
-            hoursPerLevel: [10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
-            totalHours: 325,
+            levels: 9,
+            hoursPerLevel: [10, 11, 13, 15, 17, 19, 21, 23, 25],
+            totalHours: 209,
             nextRank: "Kitchen Assistant"
         },
         "Kitchen Assistant": {
