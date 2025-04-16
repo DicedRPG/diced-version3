@@ -408,3 +408,4 @@ const DataManager = (() => {
         
         return { success: true, message: "Journal entry added" };
     }
+    })();
