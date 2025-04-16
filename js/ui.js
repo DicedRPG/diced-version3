@@ -603,6 +603,454 @@ const UIManager = (() => {
         renderAttributesDashboard(userProfile);
         renderQuestSections(userProfile, quests);
     }
+
+    /**
+ * Render the progress tab with detailed progression information
+ * @param {Object} userProfile - The user profile
+ */
+function renderProgressTab(userProfile) {
+    const progressTab = document.getElementById('progress-tab');
+    if (!progressTab) return;
+    
+    // Clear existing content
+    progressTab.innerHTML = '';
+    
+    // Add section title
+    const title = document.createElement('h2');
+    title.className = 'section-title';
+    title.textContent = 'Progress Tracking';
+    progressTab.appendChild(title);
+    
+    // Create rank progress section
+    const rankSection = document.createElement('div');
+    rankSection.className = 'progress-section';
+    
+    // Get current rank info
+    const currentRank = userProfile.currentRank.title;
+    const rankInfo = ProgressManager.RANK_PROGRESSION[currentRank];
+    
+    if (!rankInfo) {
+        console.error(`Rank information not found for ${currentRank}`);
+        return;
+    }
+    
+    // Calculate overall progress in current rank
+    const totalAttributeHours = Object.values(userProfile.attributes)
+        .reduce((sum, attr) => sum + attr.totalHours, 0) / 4; // Average across attributes
+    
+    const rankProgressPercent = Math.min((totalAttributeHours / rankInfo.totalHours) * 100, 100);
+    
+    rankSection.innerHTML = `
+        <h3>Rank Progress: ${currentRank} (${userProfile.currentRank.color})</h3>
+        <div class="progress-container">
+            <div class="progress-bar rank-progress">
+                <div class="progress-fill" style="width: ${rankProgressPercent}%; background-color: var(--primary-color);"></div>
+            </div>
+            <div class="progress-labels">
+                <span>Level ${userProfile.currentRank.level} / ${rankInfo.levels}</span>
+                <span>${Math.round(rankProgressPercent)}%</span>
+            </div>
+        </div>
+        <p class="next-rank-info">Next Rank: ${rankInfo.nextRank || "Max Rank Achieved"}</p>
+        <p class="hours-info">Total Hours: ${totalAttributeHours.toFixed(1)} / ${rankInfo.totalHours}</p>
+    `;
+    
+    progressTab.appendChild(rankSection);
+    
+    // Create attribute details section
+    const attributesSection = document.createElement('div');
+    attributesSection.className = 'attributes-detail-section';
+    
+    // Section header
+    const attributesSectionHeader = document.createElement('h3');
+    attributesSectionHeader.className = 'section-subtitle';
+    attributesSectionHeader.textContent = 'Attribute Details';
+    attributesSection.appendChild(attributesSectionHeader);
+    
+    // Create attribute grid
+    const attributeGrid = document.createElement('div');
+    attributeGrid.className = 'attribute-grid';
+    
+    // Add details for each attribute
+    const attributes = ['technique', 'ingredients', 'flavor', 'management'];
+    
+    attributes.forEach(attrName => {
+        const attrData = userProfile.attributes[attrName];
+        const attrDetail = document.createElement('div');
+        attrDetail.className = `attribute-detail ${attrName}-border`;
+        
+        // Get previous and next level hours
+        const prevLevelHours = ProgressManager.calculateHoursToLevel(
+            currentRank, 
+            attrData.currentLevel - 1
+        );
+        
+        // Format percentage for display
+        const percentage = ProgressManager.calculateLevelProgress(
+            attrData.totalHours,
+            prevLevelHours,
+            attrData.hoursToNextLevel
+        );
+        
+        // Calculate hours needed for next level
+        const hoursForCurrentLevel = attrData.hoursToNextLevel - prevLevelHours;
+        const currentLevelProgress = attrData.totalHours - prevLevelHours;
+        
+        attrDetail.innerHTML = `
+            <div class="attribute-header">
+                <span class="attribute-icon ${attrName}-icon"></span>
+                <h4>${attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h4>
+            </div>
+            <div class="attribute-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Level:</span>
+                    <span class="stat-value">${attrData.currentLevel}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Hours:</span>
+                    <span class="stat-value">${attrData.totalHours.toFixed(1)}</span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill ${attrName}-fill" style="width: ${percentage}%;"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>${currentLevelProgress.toFixed(1)} / ${hoursForCurrentLevel.toFixed(1)} hrs</span>
+                    <span>${Math.round(percentage)}%</span>
+                </div>
+            </div>
+            <p class="next-level-info">Hours to Level ${attrData.currentLevel + 1}: ${(attrData.hoursToNextLevel - attrData.totalHours).toFixed(1)}</p>
+        `;
+        
+        attributeGrid.appendChild(attrDetail);
+    });
+    
+    attributesSection.appendChild(attributeGrid);
+    progressTab.appendChild(attributesSection);
+    
+    // Add skill mastery section
+    const skillsSection = document.createElement('div');
+    skillsSection.className = 'skills-progress-section';
+    
+    // Section header
+    const skillsSectionHeader = document.createElement('h3');
+    skillsSectionHeader.className = 'section-subtitle';
+    skillsSectionHeader.textContent = 'Skills Mastery';
+    skillsSection.appendChild(skillsSectionHeader);
+    
+    // Get all techniques
+    const allTechniques = SkillsManager.getAllTechniques();
+    const masteredTechniques = userProfile.masteredTechniques || [];
+    
+    // Group techniques by category
+    const categoryCounts = {};
+    
+    // Initialize categories
+    Object.keys(ProgressManager.TECHNIQUE_CATEGORIES).forEach(category => {
+        categoryCounts[category] = {
+            total: 0,
+            mastered: 0
+        };
+    });
+    
+    // Count techniques
+    Object.values(allTechniques).forEach(technique => {
+        const category = technique.category;
+        if (categoryCounts[category]) {
+            categoryCounts[category].total++;
+            
+            if (masteredTechniques.includes(technique.id)) {
+                categoryCounts[category].mastered++;
+            }
+        }
+    });
+    
+    // Create progress bars for each category
+    Object.entries(categoryCounts).forEach(([category, counts]) => {
+        const percentage = counts.total > 0 ? (counts.mastered / counts.total) * 100 : 0;
+        const categoryData = ProgressManager.TECHNIQUE_CATEGORIES[category];
+        
+        const categoryProgress = document.createElement('div');
+        categoryProgress.className = 'category-progress';
+        categoryProgress.innerHTML = `
+            <div class="category-header">
+                <span class="category-icon">${categoryData.icon}</span>
+                <h4>${category}</h4>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%; background-color: var(--accent-color-3);"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>${counts.mastered} / ${counts.total} techniques</span>
+                    <span>${Math.round(percentage)}%</span>
+                </div>
+            </div>
+            <p class="category-description">${categoryData.description}</p>
+        `;
+        
+        skillsSection.appendChild(categoryProgress);
+    });
+    
+    progressTab.appendChild(skillsSection);
+    
+    // Add recent achievements section
+    const achievementsSection = document.createElement('div');
+    achievementsSection.className = 'achievements-section';
+    
+    // Section header
+    const achievementsSectionHeader = document.createElement('h3');
+    achievementsSectionHeader.className = 'section-subtitle';
+    achievementsSectionHeader.textContent = 'Recent Achievements';
+    achievementsSection.appendChild(achievementsSectionHeader);
+    
+    // Get recently completed quests (last 5)
+    const recentQuests = userProfile.completedQuests.slice(-5).reverse();
+    
+    if (recentQuests.length > 0) {
+        const recentQuestsList = document.createElement('ul');
+        recentQuestsList.className = 'recent-quests-list';
+        
+        // Get quest data
+        getQuestData().then(quests => {
+            recentQuests.forEach(questId => {
+                const quest = quests.find(q => q.id === questId);
+                if (!quest) return;
+                
+                const questItem = document.createElement('li');
+                questItem.className = 'recent-quest-item';
+                
+                const typeInfo = QuestManager.getQuestTypeInfo(quest.type);
+                
+                questItem.innerHTML = `
+                    <div class="quest-badge ${typeInfo.cssClass}">
+                        <span class="quest-type-icon">✓</span>
+                    </div>
+                    <div class="quest-info">
+                        <h5 class="quest-title">${quest.title}</h5>
+                        <p class="quest-type">${typeInfo.name} Quest</p>
+                    </div>
+                `;
+                
+                recentQuestsList.appendChild(questItem);
+            });
+            
+            achievementsSection.appendChild(recentQuestsList);
+            progressTab.appendChild(achievementsSection);
+        });
+    } else {
+        // No completed quests
+        const noQuestsMessage = document.createElement('p');
+        noQuestsMessage.className = 'no-quests-message';
+        noQuestsMessage.textContent = 'Complete quests to see your achievements here!';
+        achievementsSection.appendChild(noQuestsMessage);
+        progressTab.appendChild(achievementsSection);
+    }
+}
+
+// CSS for the Progress Tab
+// Add this to style.css
+const progressTabCSS = `
+/* Progress Tab Styles */
+.progress-section {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.progress-container {
+    margin: 1rem 0;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.next-rank-info, .next-level-info {
+    font-weight: bold;
+    color: var(--accent-color-1);
+}
+
+.hours-info {
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.attribute-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.attribute-detail {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.attribute-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.attribute-header h4 {
+    margin: 0;
+    margin-left: 0.5rem;
+}
+
+.attribute-stats {
+    margin-bottom: 0.8rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+}
+
+.category-progress {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.category-header h4 {
+    margin: 0;
+    margin-left: 0.5rem;
+}
+
+.category-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.achievements-section {
+    margin-top: 2rem;
+}
+
+.recent-quests-list {
+    list-style: none;
+    padding: 0;
+}
+
+.recent-quest-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.quest-badge {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quest-info {
+    flex: 1;
+}
+
+.quest-title {
+    margin: 0;
+    margin-bottom: 0.3rem;
+}
+
+.quest-type {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.no-quests-message {
+    text-align: center;
+    color: #666;
+    padding: 2rem;
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .attribute-grid {
+        grid-template-columns: 1fr;
+    }
+}
+`;
+
+// Modify handleTabClick to call renderProgressTab when needed
+function handleTabClick(event) {
+    event.preventDefault();
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    event.currentTarget.classList.add('active');
+    
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        content.classList.add('hidden');
+    });
+    
+    // Show selected tab content
+    const tabName = event.currentTarget.getAttribute('data-tab');
+    const tabContent = document.getElementById(`${tabName}-tab`);
+    
+    if (tabContent) {
+        tabContent.classList.add('active');
+        tabContent.classList.remove('hidden');
+        
+        // Special handling for skills tab
+        if (tabName === 'skills') {
+            const userProfile = DataManager.getUserProfile();
+            renderSkillsTab(userProfile);
+        }
+        
+        // Special handling for progress tab
+        if (tabName === 'progress') {
+            const userProfile = DataManager.getUserProfile();
+            renderProgressTab(userProfile);
+        }
+    }
+    
+    console.log(`Switched to ${tabName} tab`);
+}
     
     // ======================================================================
     // SKILLS UI FUNCTIONS
