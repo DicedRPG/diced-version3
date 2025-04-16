@@ -201,6 +201,10 @@
             transition: transform 0.2s;
             cursor: pointer;
         }
+
+            .training-border {
+                        border: 2px solid var(--primary-color);
+            }
         
         .quest-card:hover {
             transform: translateY(-5px);
