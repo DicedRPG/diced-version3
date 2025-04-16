@@ -95,6 +95,18 @@
             .technique-border {
                          border: 2px solid var(--accent-color-3);
             }
+
+            .ingredients-border {
+                         border: 2px solid var(--primary-color);
+            }
+
+            .flavor-border {
+                         border: 2px solid var(--accent-color-2);
+            }
+
+            .management-border {
+                         border: 2px solid var(--accent-color-1);
+            }
         
         .attribute-title {
             font-weight: bold;
