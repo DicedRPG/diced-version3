@@ -253,12 +253,12 @@ const UIManager = (() => {
      * @returns {HTMLElement} - The quest card element
      */
     function createQuestCard(quest) {
+        const typeInfo = QuestManager.getQuestTypeInfo(quest.type);
+        
         const card = document.createElement('div');
         card.className = `quest-card ${typeInfo.cssClass}-border`;
         card.setAttribute('data-quest-id', quest.id);
         card.onclick = () => openQuestDetail(quest.id);
-        
-        const typeInfo = QuestManager.getQuestTypeInfo(quest.type);
         
         // Format time required
         const timeRequired = ProgressManager.formatTimeRequired(quest.timeRequired);
