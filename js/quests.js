@@ -1,6 +1,7 @@
 /**
  * quests.js - Handles all quest-related functionality
  * This file manages quest completion, quest selection, and other quest-related operations.
+ * Updated with ProgressManager integration.
  */
 
 // Quest manager namespace
@@ -94,6 +95,42 @@ const QuestManager = (() => {
     }
     
     /**
+     * Get appropriate quests for the current user level using ProgressManager
+     * @param {Object} userProfile - The user profile
+     * @param {number} count - The number of quests to return
+     * @returns {Array} - Array of appropriate quests
+     */
+    function getAppropriateQuests(userProfile, count = 3) {
+        if (!userProfile) {
+            console.error('User profile is required for getAppropriateQuests');
+            return [];
+        }
+        
+        // Get available quests
+        const availableQuests = getAvailableQuests(userProfile);
+        
+        // Use ProgressManager to filter by appropriate level
+        return ProgressManager.getAppropriateQuests(userProfile, availableQuests, count);
+    }
+    
+    /**
+     * Get the next challenge quest for the user
+     * @param {Object} userProfile - The user profile
+     * @returns {Promise<Object|null>} - Promise resolving to the next challenge quest or null
+     */
+    function getNextChallengeQuest(userProfile) {
+        if (!userProfile) {
+            console.error('User profile is required for getNextChallengeQuest');
+            return Promise.resolve(null);
+        }
+        
+        // Get all quests
+        return DataManager.getQuestData().then(quests => {
+            return ProgressManager.getNextChallengeQuest(userProfile, quests);
+        });
+    }
+    
+    /**
      * Attempt to complete a quest
      * @param {string} questId - The quest ID
      * @returns {Promise<Object>} - Promise resolving to result object
@@ -120,6 +157,66 @@ const QuestManager = (() => {
         }
         
         return getQuest(currentQuestId);
+    }
+    
+    /**
+     * Format time required for a quest using ProgressManager
+     * @param {number} minutes - Time in minutes
+     * @returns {string} - Formatted time string
+     */
+    function formatTimeRequired(minutes) {
+        return ProgressManager.formatTimeRequired(minutes);
+    }
+    
+    /**
+     * Calculate total hours earned from a quest using ProgressManager
+     * @param {Object} quest - The quest object
+     * @returns {number} - Total hours earned
+     */
+    function calculateQuestHours(quest) {
+        return ProgressManager.calculateQuestHours(quest);
+    }
+    
+    /**
+     * Check if a quest is appropriate for the user's current level
+     * @param {Object} quest - The quest object
+     * @param {Object} userProfile - The user profile
+     * @returns {boolean} - Whether the quest is appropriate
+     */
+    function isQuestAppropriate(quest, userProfile) {
+        if (!quest || !userProfile) return false;
+        
+        const currentRank = userProfile.currentRank.title;
+        const currentLevel = userProfile.currentRank.level;
+        
+        // Check if quest is for the same rank
+        if (quest.rank.title !== currentRank) {
+            return false;
+        }
+        
+        // Allow quests for current level or one level above
+        return quest.rank.level <= currentLevel + 1;
+    }
+    
+    /**
+     * Get quest difficulty indicator based on user's current level
+     * @param {Object} quest - The quest object
+     * @param {Object} userProfile - The user profile
+     * @returns {string} - Difficulty indicator (easy, moderate, challenging)
+     */
+    function getQuestDifficulty(quest, userProfile) {
+        if (!quest || !userProfile) return 'unknown';
+        
+        const currentLevel = userProfile.currentRank.level;
+        const questLevel = quest.rank.level;
+        
+        if (questLevel < currentLevel) {
+            return 'easy';
+        } else if (questLevel === currentLevel) {
+            return 'moderate';
+        } else {
+            return 'challenging';
+        }
     }
     
     /**
@@ -218,119 +315,41 @@ const QuestManager = (() => {
             description: "Complete this quest"
         };
     }
-
+    
     /**
- * QuestManager Updates for ProgressManager Integration
- * This code updates the QuestManager module to integrate with ProgressManager
- */
-
-// The following should be added or modified in the QuestManager namespace
-
-/**
- * Get appropriate quests for the current user level using ProgressManager
- * @param {number} count - The number of quests to return
- * @returns {Array} - Array of appropriate quests
- */
-function getAppropriateQuests(userProfile, count = 3) {
-    if (!userProfile) {
-        console.error('User profile is required for getAppropriateQuests');
-        return [];
+     * Get quest rewards text description
+     * @param {Object} rewards - The reward object with attributes
+     * @returns {string} - Formatted rewards text
+     */
+    function getQuestRewardsText(rewards) {
+        if (!rewards) return "No rewards";
+        
+        return Object.entries(rewards)
+            .filter(([_, value]) => value > 0)
+            .map(([attr, value]) => `${attr.charAt(0).toUpperCase() + attr.slice(1)} +${value}`)
+            .join(', ');
     }
     
-    // Get available quests
-    const availableQuests = getAvailableQuests(userProfile);
-    
-    // Use ProgressManager to filter by appropriate level
-    return ProgressManager.getAppropriateQuests(userProfile, availableQuests, count);
-}
-
-/**
- * Get the next challenge quest for the user
- * @param {Object} userProfile - The user profile
- * @returns {Object|null} - The next challenge quest or null
- */
-function getNextChallengeQuest(userProfile) {
-    if (!userProfile) {
-        console.error('User profile is required for getNextChallengeQuest');
-        return null;
+    /**
+     * Filter quests by attribute focus
+     * @param {Array} quests - Quests to filter
+     * @param {string} attribute - Attribute to focus on (technique, ingredients, flavor, management)
+     * @param {number} count - Maximum number of quests to return
+     * @returns {Array} - Filtered and sorted quests
+     */
+    function getQuestsByAttributeFocus(quests, attribute, count = 3) {
+        if (!quests || quests.length === 0) return [];
+        
+        // Sort quests by reward for the specified attribute
+        const sortedQuests = [...quests].sort((a, b) => {
+            const aReward = a.attributeRewards[attribute] || 0;
+            const bReward = b.attributeRewards[attribute] || 0;
+            return bReward - aReward;
+        });
+        
+        // Return top N quests
+        return sortedQuests.slice(0, count);
     }
-    
-    // Get all quests
-    return DataManager.getQuestData().then(quests => {
-        return ProgressManager.getNextChallengeQuest(userProfile, quests);
-    });
-}
-
-/**
- * Format time required for a quest using ProgressManager
- * @param {number} minutes - Time in minutes
- * @returns {string} - Formatted time string
- */
-function formatTimeRequired(minutes) {
-    return ProgressManager.formatTimeRequired(minutes);
-}
-
-/**
- * Calculate total hours earned from a quest using ProgressManager
- * @param {Object} quest - The quest object
- * @returns {number} - Total hours earned
- */
-function calculateQuestHours(quest) {
-    return ProgressManager.calculateQuestHours(quest);
-}
-
-/**
- * Check if a quest is appropriate for the user's current level
- * @param {Object} quest - The quest object
- * @param {Object} userProfile - The user profile
- * @returns {boolean} - Whether the quest is appropriate
- */
-function isQuestAppropriate(quest, userProfile) {
-    if (!quest || !userProfile) return false;
-    
-    const currentRank = userProfile.currentRank.title;
-    const currentLevel = userProfile.currentRank.level;
-    
-    // Check if quest is for the same rank
-    if (quest.rank.title !== currentRank) {
-        return false;
-    }
-    
-    // Allow quests for current level or one level above
-    return quest.rank.level <= currentLevel + 1;
-}
-
-/**
- * Get quest difficulty indicator based on user's current level
- * @param {Object} quest - The quest object
- * @param {Object} userProfile - The user profile
- * @returns {string} - Difficulty indicator (easy, moderate, challenging)
- */
-function getQuestDifficulty(quest, userProfile) {
-    if (!quest || !userProfile) return 'unknown';
-    
-    const currentLevel = userProfile.currentRank.level;
-    const questLevel = quest.rank.level;
-    
-    if (questLevel < currentLevel) {
-        return 'easy';
-    } else if (questLevel === currentLevel) {
-        return 'moderate';
-    } else {
-        return 'challenging';
-    }
-}
-
-// Add these functions to the public API in the return statement
-// return {
-//     ...
-//     getAppropriateQuests,
-//     getNextChallengeQuest,
-//     formatTimeRequired,
-//     calculateQuestHours,
-//     isQuestAppropriate,
-//     getQuestDifficulty
-//
     
     // Public API
     return {
@@ -345,11 +364,14 @@ function getQuestDifficulty(quest, userProfile) {
         getCurrentQuest,
         generateRandomElement,
         getQuestTypeInfo,
+        // New functions with ProgressManager integration
         getAppropriateQuests,
         getNextChallengeQuest,
         formatTimeRequired,
         calculateQuestHours,
         isQuestAppropriate,
-        getQuestDifficulty
+        getQuestDifficulty,
+        getQuestRewardsText,
+        getQuestsByAttributeFocus
     };
 })();
