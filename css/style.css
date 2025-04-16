@@ -46,9 +46,7 @@
             position: fixed;
             width: 100%;
             max-width: 800px;
-            align: center;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
             border-radius: 0.5rem;
             top: 0;
             z-index: 100;
@@ -86,7 +84,7 @@
         .attribute-card {
             background-color: var(--card-color);
             border: 2px;
-            border-color: var(--accent-color);
+            border-color: var(--accent-color-1);
             border-radius: 0.5rem;
             padding: 1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
