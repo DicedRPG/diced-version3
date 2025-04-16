@@ -203,19 +203,19 @@
         }
 
             .training-quest-border {
-                        border: 2px solid var(--primary-color);
+                        border: 1px solid var(--primary-color);
             }
 
              .side-quest-border {
-                        border: 2px solid var(--flavor-color);
+                        border: 1px solid var(--flavor-color);
             }
 
              .main-quest-border {
-                        border: 2px solid var(--management-color);
+                        border: 1px solid var(--management-color);
             }
 
              .explore-quest-border {
-                        border: 2px solid var(--technique-color);
+                        border: 1px solid var(--technique-color);
             }
         
         .quest-card:hover {
