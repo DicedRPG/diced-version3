@@ -46,25 +46,25 @@ const DataManager = (() => {
                 technique: {
                     totalHours: 0,
                     currentLevel: 1,
-                    hoursToNextLevel: 20,
+                    hoursToNextLevel: 5,
                     progressPercentage: 0
                 },
                 ingredients: {
                     totalHours: 0,
                     currentLevel: 1,
-                    hoursToNextLevel: 20,
+                    hoursToNextLevel: 5,
                     progressPercentage: 0
                 },
                 flavor: {
                     totalHours: 0,
                     currentLevel: 1,
-                    hoursToNextLevel: 20,
+                    hoursToNextLevel: 5,
                     progressPercentage: 0
                 },
                 management: {
                     totalHours: 0,
                     currentLevel: 1, 
-                    hoursToNextLevel: 20,
+                    hoursToNextLevel: 5,
                     progressPercentage: 0
                 }
             },
