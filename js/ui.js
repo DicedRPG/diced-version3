@@ -254,7 +254,7 @@ const UIManager = (() => {
      */
     function createQuestCard(quest) {
         const card = document.createElement('div');
-        card.className = 'quest-card';
+        card.className = `quest-card ${typeInfo.cssClass}`;
         card.setAttribute('data-quest-id', quest.id);
         card.onclick = () => openQuestDetail(quest.id);
         
