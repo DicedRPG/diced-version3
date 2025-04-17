@@ -689,7 +689,7 @@ function renderProgressTab(userProfile) {
     rankViz.className = 'rank-progress-visualization';
     
     // Determine how many ranks to show (max 4)
-    const maxRanksToShow = 4;
+    const maxRanksToShow = 3;
     let startRank = Math.max(0, currentRankIndex - 1);
     let endRank = Math.min(rankNames.length - 1, startRank + maxRanksToShow - 1);
     
@@ -710,12 +710,12 @@ function renderProgressTab(userProfile) {
         if (i === currentRankIndex) rankIcon.classList.add('current');
         
         // Add rank label
-        const rankLabel = document.createElement('span');
-        rankLabel.className = 'rank-label';
-        rankLabel.textContent = rankName;
-        rankIcon.appendChild(rankLabel);
+        //const rankLabel = document.createElement('span');
+        //rankLabel.className = 'rank-label';
+        //rankLabel.textContent = rankName;
+        //rankIcon.appendChild(rankLabel);
         
-        rankViz.appendChild(rankIcon);
+        // rankViz.appendChild(rankIcon);
         
         // Add connector if not the last rank
         // if (i < endRank) {
