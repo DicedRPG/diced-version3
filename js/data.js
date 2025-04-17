@@ -268,8 +268,12 @@ const DataManager = (() => {
         userProfile.milestones.techniquesLearned += techniquesLearned;
         
         // Calculate total hours added
-        const totalHoursAdded = Object.values(rewards).reduce((sum, val) => sum + val, 0);
-        userProfile.milestones.hoursAccumulated += totalHoursAdded;
+        const totalHours = Object.values(userProfile.attributes)
+    .reduce((sum, attr) => sum + attr.totalHours, 0);
+
+const hoursInfo = document.createElement('p');
+hoursInfo.className = 'hours-info';
+hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.totalHours * 4}`;
         
         // Unlock new quests if defined
         if (quest.unlocks && Array.isArray(quest.unlocks)) {
