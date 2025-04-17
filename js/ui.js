@@ -700,9 +700,9 @@ if (endRank - startRank < maxRanksToShow - 1) {
 
 // Define rank icon mapping (rank name to image path)
 const rankIconMapping = {
-    "Home Cook": "../src/icon-50x50.png",
-    "Culinary Student": "../src/icon-50x50.png",
-    "Kitchen Assistant": "../src/icon-50x50.png",
+    "Home Cook": "../src/icon-bronze-50x50.png",
+    "Culinary Student": "../src/icon-iron-50x50.png",
+    "Kitchen Assistant": "../src/icon-silver-50x50.png",
     "Line Cook": "../src/icon-50x50.png",
     "Sous Chef": "../src/icon-50x50.png",
     "Head Chef": "../src/icon-50x50.png"
