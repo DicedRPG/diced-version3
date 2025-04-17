@@ -708,7 +708,8 @@ function renderProgressTab(userProfile) {
         rankIcon.className = 'rank-icon';
         if (i < currentRankIndex) rankIcon.classList.add('active');
         if (i === currentRankIndex) rankIcon.classList.add('current');
-        
+
+        rankViz.appendChild(rankIcon);
         // Add rank label
         //const rankLabel = document.createElement('span');
         //rankLabel.className = 'rank-label';
