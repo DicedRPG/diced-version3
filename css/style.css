@@ -880,17 +880,17 @@
 /* Base styles for each rank color */
 .rank-icon.rank-bronze {
     background-color: #CD7F32;
-    background-image: url('../src/bronze-texture.png');
+    background-image: url('../src/icon-bronze-50x50.png');
 }
 
 .rank-icon.rank-iron {
     background-color: #C0C0C0;
-    background-image: url('../src/iron-texture.png');
+    background-image: url('../src/icon-iron-50x50.png');
 }
 
 .rank-icon.rank-silver {
     background-color: #C0C0C0;
-    background-image: url('../src/silver-texture.png');
+    background-image: url('../src/icon-silver-50x50.png');
 }
 
 .rank-icon.rank-gold {
