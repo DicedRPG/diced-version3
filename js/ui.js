@@ -1568,6 +1568,6 @@ function learnSkill(skillId, userProfile) {
         refreshUI,
         showNotification,
         renderProgressTab,
-        renderSkillsTab: 
+        renderSkillsTab
     };
 })();
