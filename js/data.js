@@ -251,8 +251,11 @@ const DataManager = (() => {
         if (quest.techniquesLearned && Array.isArray(quest.techniquesLearned)) {
             quest.techniquesLearned.forEach(technique => {
                 if (!userProfile.masteredTechniques.includes(technique)) {
-                    userProfile.masteredTechniques.push(technique);
-                    techniquesLearned++;
+                userProfile.masteredTechniques.push(technique);
+                techniquesLearned++;
+            
+            // Log the technique learned for debugging
+            console.log(`Learned technique: ${technique}`);
                 }
             });
         }
