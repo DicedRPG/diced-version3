@@ -689,7 +689,7 @@ function renderProgressTab(userProfile) {
     rankViz.className = 'rank-progress-visualization';
     
     // Determine how many ranks to show (max 4)
-    const maxRanksToShow = 3;
+    const maxRanksToShow = 4;
     let startRank = Math.max(0, currentRankIndex - 1);
     let endRank = Math.min(rankNames.length - 1, startRank + maxRanksToShow - 1);
     
