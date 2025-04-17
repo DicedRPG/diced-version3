@@ -713,12 +713,12 @@ const UIManager = (() => {
             // rankIcon.textContent = (i + 1).toString();
             
             // Add rank label
-            const rankLabel = document.createElement('span');
-            rankLabel.className = 'rank-label';
-            rankLabel.textContent = rankName;
-            rankIcon.appendChild(rankLabel);
+            // const rankLabel = document.createElement('span');
+            // rankLabel.className = 'rank-label';
+            // rankLabel.textContent = rankName;
+            // rankIcon.appendChild(rankLabel);
             
-            rankViz.appendChild(rankIcon);
+            // rankViz.appendChild(rankIcon);
             
             // Add connector if not the last rank
             if (i < endRank) {
