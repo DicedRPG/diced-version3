@@ -207,7 +207,7 @@ const DataManager = (() => {
      */
     async function completeQuest(questId) {
         // Load user profile and quest data
-        const userProfile = loadUserProfile();
+        let userProfile = loadUserProfile();
         const quests = await getQuestData();
         
         // Find the quest
