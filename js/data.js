@@ -4,6 +4,7 @@
  * from the server and managing local storage for user progress.
  * 
  * UPDATED: Now fully integrated with ProgressManager for progression tracking
+ * FIXED: Issues with skills updating and hours calculation
  */
 
 // Data manager namespace
@@ -102,6 +103,28 @@ const DataManager = (() => {
         if (storedProfile) {
             try {
                 dataStore.userProfile = JSON.parse(storedProfile);
+                
+                // Ensure masteredTechniques is an array
+                if (!dataStore.userProfile.masteredTechniques) {
+                    dataStore.userProfile.masteredTechniques = [];
+                }
+                
+                // Ensure recentAchievements is an array
+                if (!dataStore.userProfile.recentAchievements) {
+                    dataStore.userProfile.recentAchievements = [];
+                }
+                
+                // Ensure milestones object exists
+                if (!dataStore.userProfile.milestones) {
+                    dataStore.userProfile.milestones = {
+                        questsCompleted: 0,
+                        techniquesLearned: 0,
+                        hoursAccumulated: 0,
+                        rankAdvances: 0,
+                        levelUps: 0
+                    };
+                }
+                
                 return dataStore.userProfile;
             } catch (e) {
                 console.error('Error parsing stored user profile:', e);
@@ -198,6 +221,34 @@ const DataManager = (() => {
     }
     
     /**
+     * Debug quest techniques - helper for fixing skills issue
+     * @param {string} questId - The quest ID to debug
+     */
+    function debugQuestTechniques(questId) {
+        getQuestData().then(quests => {
+            const quest = quests.find(q => q.id === questId);
+            
+            if (!quest) {
+                console.error(`Quest not found: ${questId}`);
+                return;
+            }
+            
+            console.log(`Quest ${questId}: ${quest.title}`);
+            console.log(`Techniques learned: ${JSON.stringify(quest.techniquesLearned || [])}`);
+            
+            // Check if techniques exist in SkillsManager
+            if (quest.techniquesLearned && Array.isArray(quest.techniquesLearned)) {
+                quest.techniquesLearned.forEach(techniqueId => {
+                    const technique = SkillsManager.getAllTechniques()[techniqueId];
+                    console.log(`Technique ${techniqueId}: ${technique ? 'Exists' : 'NOT FOUND'}`);
+                });
+            } else {
+                console.warn(`Quest ${questId} has no techniquesLearned array defined`);
+            }
+        });
+    }
+    
+    /**
      * Update user attributes when completing a quest
      * @param {string} questId - The ID of the completed quest
      * @returns {Object} - Result object with success status and message
@@ -233,6 +284,11 @@ const DataManager = (() => {
             };
         }
         
+        // Debug: Log before completion state
+        console.log(`Before completion - Attribute hours:`, 
+            Object.entries(userProfile.attributes).map(([attr, data]) => 
+                `${attr}: ${data.totalHours.toFixed(1)}`).join(', '));
+        
         // Add attribute rewards
         const rewards = {};
         const previousRank = userProfile.currentRank.title;
@@ -246,18 +302,26 @@ const DataManager = (() => {
             }
         });
         
+        // Debug: Log quest techniques
+        console.log(`Quest ${questId} techniques:`, quest.techniquesLearned || 'none defined');
+        
         // Add techniques learned if present
         let techniquesLearned = 0;
         if (quest.techniquesLearned && Array.isArray(quest.techniquesLearned)) {
             quest.techniquesLearned.forEach(technique => {
                 if (!userProfile.masteredTechniques.includes(technique)) {
-                userProfile.masteredTechniques.push(technique);
-                techniquesLearned++;
-            
-            // Log the technique learned for debugging
-            console.log(`Learned technique: ${technique}`);
+                    // Debug: Log technique being added
+                    console.log(`Adding technique ${technique} to masteredTechniques`);
+                    
+                    userProfile.masteredTechniques.push(technique);
+                    techniquesLearned++;
                 }
             });
+            
+            // Debug: Log masteredTechniques after adding
+            console.log(`masteredTechniques after update:`, userProfile.masteredTechniques);
+        } else {
+            console.warn(`Quest ${questId} has no techniquesLearned array or it's not valid`);
         }
         
         // Mark quest as completed
@@ -268,12 +332,8 @@ const DataManager = (() => {
         userProfile.milestones.techniquesLearned += techniquesLearned;
         
         // Calculate total hours added
-        const totalHours = Object.values(userProfile.attributes)
-    .reduce((sum, attr) => sum + attr.totalHours, 0);
-
-const hoursInfo = document.createElement('p');
-hoursInfo.className = 'hours-info';
-hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.totalHours * 4}`;
+        const totalHoursAdded = Object.values(rewards).reduce((sum, val) => sum + val, 0);
+        userProfile.milestones.hoursAccumulated += totalHoursAdded;
         
         // Unlock new quests if defined
         if (quest.unlocks && Array.isArray(quest.unlocks)) {
@@ -299,6 +359,11 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
         if (userProfile.recentAchievements.length > 10) {
             userProfile.recentAchievements.pop();
         }
+        
+        // Debug: Log after completion state
+        console.log(`After completion - Attribute hours:`, 
+            Object.entries(userProfile.attributes).map(([attr, data]) => 
+                `${attr}: ${data.totalHours.toFixed(1)}`).join(', '));
         
         // Save changes
         saveUserProfile();
@@ -382,7 +447,12 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
             return false;
         }
         
+        // Debug: Log before and after hours
+        const beforeHours = userProfile.attributes[attribute].totalHours;
         userProfile.attributes[attribute].totalHours += hours;
+        const afterHours = userProfile.attributes[attribute].totalHours;
+        
+        console.log(`Updated ${attribute}: ${beforeHours.toFixed(1)} + ${hours} = ${afterHours.toFixed(1)}`);
         
         // Calculate progress percentage using ProgressManager
         const attrData = userProfile.attributes[attribute];
@@ -430,6 +500,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
             
             // Use ProgressManager to check if can level up
             if (ProgressManager.canLevelUp(attribute, currentRank)) {
+                // Debug: Log level up
+                console.log(`${attr} leveled up from ${attribute.currentLevel} to ${attribute.currentLevel + 1}`);
+                
                 // Level up the attribute
                 attribute.currentLevel += 1;
                 
@@ -437,6 +510,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
                 if (attribute.currentLevel <= rankInfo.levels) {
                     const nextLevelHours = rankInfo.hoursPerLevel[attribute.currentLevel - 1];
                     attribute.hoursToNextLevel = attribute.totalHours + nextLevelHours;
+                    
+                    // Debug: Log new level target
+                    console.log(`${attr} new target: ${attribute.hoursToNextLevel.toFixed(1)} hours`);
                 }
                 
                 // Reset progress percentage
@@ -446,6 +522,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
         
         // Use ProgressManager to check if can rank up
         if (ProgressManager.canRankUp(userProfile)) {
+            // Debug: Log rank up
+            console.log(`Ranking up from ${currentRank} to ${rankInfo.nextRank}`);
+            
             // Rank up!
             userProfile.currentRank.title = rankInfo.nextRank;
             userProfile.currentRank.color = ProgressManager.RANK_PROGRESSION[rankInfo.nextRank].color;
@@ -458,6 +537,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
                 attribute.hoursToNextLevel = attribute.totalHours + 
                     ProgressManager.RANK_PROGRESSION[rankInfo.nextRank].hoursPerLevel[0];
                 attribute.progressPercentage = 0;
+                
+                // Debug: Log new attribute targets
+                console.log(`${attr} reset to level 1, new target: ${attribute.hoursToNextLevel.toFixed(1)} hours`);
             });
         } else {
             // Just update the current level within the rank
@@ -465,6 +547,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
                 ...Object.values(userProfile.attributes).map(attr => attr.currentLevel)
             );
             userProfile.currentRank.level = lowestLevel;
+            
+            // Debug: Log rank level update
+            console.log(`Rank level updated to ${lowestLevel} (lowest attribute level)`);
         }
         
         // Save changes
@@ -556,12 +641,16 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
         // Calculate rank progress
         const currentRank = userProfile.currentRank.title;
         const rankInfo = ProgressManager.RANK_PROGRESSION[currentRank];
-        const rankProgress = totalHours / (rankInfo.totalHours * 4); // Multiply by 4 as total hours is per attribute
+        
+        // Calculate average hours per attribute (this is what determines rank progression)
+        const avgHoursPerAttribute = totalHours / 4;
+        const rankProgress = avgHoursPerAttribute / rankInfo.totalHours;
         
         return {
             questsCompleted: userProfile.completedQuests.length,
             techniquesLearned: userProfile.masteredTechniques.length,
             totalHours: totalHours,
+            avgHoursPerAttribute: avgHoursPerAttribute,
             avgLevel: avgLevel,
             attributeBalance: attributeBalance,
             rankProgress: rankProgress,
@@ -598,6 +687,9 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
         
         // Add technique
         userProfile.masteredTechniques.push(techniqueId);
+        
+        // Debug: Log technique added
+        console.log(`Manually added technique ${techniqueId} to masteredTechniques`);
         
         // Update milestone counter
         userProfile.milestones.techniquesLearned++;
@@ -648,6 +740,8 @@ hoursInfo.textContent = `Total Hours: ${totalHours.toFixed(1)} / ${rankInfo.tota
         resetUserProgress: resetUserProgress,
         getUserStats: getUserStats,
         getRecentAchievements: getRecentAchievements,
-        addMasteredTechnique: addMasteredTechnique
+        addMasteredTechnique: addMasteredTechnique,
+        // Debug functions
+        debugQuestTechniques: debugQuestTechniques
     };
 })();
