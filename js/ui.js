@@ -713,44 +713,45 @@ for (let i = startRank; i <= endRank; i++) {
     const rankName = rankNames[i];
     const rankData = ProgressionSystem.RANKS[rankName];
     const iconPath = rankIconMapping[rankName] || "../src/icon-50x50.png";
+
+    // Create item container to hold icon and label
+    const rankItem = document.createElement('div');
+    rankItem.className = 'rank-item';
     
     // Create rank icon
     const rankIcon = document.createElement('div');
     rankIcon.className = 'rank-icon';
     
-    // Set the appropriate icon image based on rank
-    rankIcon.style.backgroundImage = `url('${iconPath}')`;
-    rankIcon.style.backgroundSize = 'cover';
+     // Add rank-specific class based on the rank's color
+    rankIcon.classList.add(`rank-${rankColor}`);
     
     // Apply status classes
     if (i < currentRankIndex) rankIcon.classList.add('previous');
     if (i === currentRankIndex) rankIcon.classList.add('current');
     if (i > currentRankIndex) rankIcon.classList.add('next');
     
-    // Add the rank name as a label
-    const rankLabel = document.createElement('span');
+   // Add rank label
+    const rankLabel = document.createElement('div');
     rankLabel.className = 'rank-label';
     rankLabel.textContent = rankName;
-    rankIcon.appendChild(rankLabel);
+
+    // Assemble the item
+    rankItem.appendChild(rankIcon);
+    rankItem.appendChild(rankLabel);
+    rankProgressContainer.appendChild(rankItem);
     
-    rankViz.appendChild(rankIcon);
-        // Add rank label
-        //const rankLabel = document.createElement('span');
-        //rankLabel.className = 'rank-label';
-        //rankLabel.textContent = rankName;
-        //rankIcon.appendChild(rankLabel);
-        
-        // rankViz.appendChild(rankIcon);
-        
-        // Add connector if not the last rank
-        // if (i < endRank) {
-            //const connector = document.createElement('div');
-            //connector.className = 'rank-connector';
-            //if (i < currentRankIndex) connector.classList.add('active');
-            //rankViz.appendChild(connector);
-        //}
+    // Add connector between icons (except for the last one)
+    if (i < endRank) {
+        const connector = document.createElement('div');
+        connector.className = 'rank-connector';
+        if (i < currentRankIndex) connector.classList.add('active');
+        rankProgressContainer.appendChild(connector);
     }
-    
+   
+    // Add the container to the visualization
+    rankViz.appendChild(rankProgressContainer);
+      
+    // Add the rank visualization to the section
     rankSection.appendChild(rankViz);
     
     // Add current rank info - now with correct level display from progression system
