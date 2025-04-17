@@ -754,9 +754,9 @@ function renderProgressTab(userProfile) {
     const progressLabels = document.createElement('div');
     progressLabels.className = 'progress-labels';
     
-    // Display current level out of total levels for this rank
-    const levelLabel = document.createElement('span');
-    levelLabel.textContent = `Level ${userProfile.currentRank.level} / ${rankInfo.levels}`;
+    // Display current rank progress for this rank
+    const progressLabel = document.createElement('span');
+    progressLabel.textContent = `Overall Rank Progress`;
     
     const percentLabel = document.createElement('span');
     percentLabel.textContent = `${Math.round(overallProgressPercent)}%`;
