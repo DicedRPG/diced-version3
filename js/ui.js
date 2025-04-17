@@ -710,7 +710,7 @@ const UIManager = (() => {
             if (i < currentRankIndex) rankIcon.classList.add('active');
             if (i === currentRankIndex) rankIcon.classList.add('current');
             
-            rankIcon.textContent = (i + 1).toString();
+            // rankIcon.textContent = (i + 1).toString();
             
             // Add rank label
             const rankLabel = document.createElement('span');
