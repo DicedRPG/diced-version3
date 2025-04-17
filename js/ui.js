@@ -698,22 +698,16 @@ if (endRank - startRank < maxRanksToShow - 1) {
     startRank = Math.max(0, endRank - (maxRanksToShow - 1));
 }
 
-// Define rank icon mapping (rank name to image path)
-const rankIconMapping = {
-    "Home Cook": "../src/icon-bronze-50x50.png",
-    "Culinary Student": "../src/icon-iron-50x50.png",
-    "Kitchen Assistant": "../src/icon-silver-50x50.png",
-    "Line Cook": "../src/icon-50x50.png",
-    "Sous Chef": "../src/icon-50x50.png",
-    "Head Chef": "../src/icon-50x50.png"
-};
+// Create a container for the rank progression
+const rankProgressContainer = document.createElement('div');
+rankProgressContainer.className = 'rank-progress-container';
 
 // Create rank icons and connectors
 for (let i = startRank; i <= endRank; i++) {
     const rankName = rankNames[i];
     const rankData = ProgressionSystem.RANKS[rankName];
-    const iconPath = rankIconMapping[rankName] || "../src/icon-50x50.png";
-
+    const rankColor = rankData.color.toLowerCase();
+    
     // Create item container to hold icon and label
     const rankItem = document.createElement('div');
     rankItem.className = 'rank-item';
@@ -722,19 +716,19 @@ for (let i = startRank; i <= endRank; i++) {
     const rankIcon = document.createElement('div');
     rankIcon.className = 'rank-icon';
     
-     // Add rank-specific class based on the rank's color
+    // Add rank-specific class based on the rank's color
     rankIcon.classList.add(`rank-${rankColor}`);
     
-    // Apply status classes
-    if (i < currentRankIndex) rankIcon.classList.add('previous');
+    // Add relative position classes
+    if (i < currentRankIndex) rankIcon.classList.add('active');
     if (i === currentRankIndex) rankIcon.classList.add('current');
     if (i > currentRankIndex) rankIcon.classList.add('next');
     
-   // Add rank label
+    // Add rank label
     const rankLabel = document.createElement('div');
     rankLabel.className = 'rank-label';
     rankLabel.textContent = rankName;
-
+    
     // Assemble the item
     rankItem.appendChild(rankIcon);
     rankItem.appendChild(rankLabel);
@@ -747,12 +741,13 @@ for (let i = startRank; i <= endRank; i++) {
         if (i < currentRankIndex) connector.classList.add('active');
         rankProgressContainer.appendChild(connector);
     }
-   
-    // Add the container to the visualization
-    rankViz.appendChild(rankProgressContainer);
-      
-    // Add the rank visualization to the section
-    rankSection.appendChild(rankViz);
+}
+
+// Add the container to the visualization
+rankViz.appendChild(rankProgressContainer);
+
+// Add the rank visualization to the section
+rankSection.appendChild(rankViz);
     
     // Add current rank info - now with correct level display from progression system
     const rankTitle = document.createElement('h4');
