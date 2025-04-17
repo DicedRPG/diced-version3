@@ -729,10 +729,9 @@ function renderProgressTab(userProfile) {
     
     rankSection.appendChild(rankViz);
     
-    // Add current rank info - REMOVING the level display
+    // Add current rank info - now with correct level display from progression system
     const rankTitle = document.createElement('h4');
-    // Remove "• Level X" since it's not relevant in the new system
-    rankTitle.textContent = `${currentRank} (${userProfile.currentRank.color})`;
+    rankTitle.textContent = `${currentRank} (${userProfile.currentRank.color}) • Level ${userProfile.currentRank.level}`;
     rankSection.appendChild(rankTitle);
     
     // Add progress bar - now using the progressPercentage directly from the userProfile
@@ -752,18 +751,18 @@ function renderProgressTab(userProfile) {
     progressBar.appendChild(progressFill);
     progressContainer.appendChild(progressBar);
     
-    // Add progress labels - REMOVING the level X/Y display, only showing percentage
+    // Add progress labels
     const progressLabels = document.createElement('div');
     progressLabels.className = 'progress-labels';
     
-    // Create a more meaningful left label - overall progress
-    const progressLabel = document.createElement('span');
-    progressLabel.textContent = `Overall Rank Progress`;
+    // Display current level out of total levels for this rank
+    const levelLabel = document.createElement('span');
+    levelLabel.textContent = `Level ${userProfile.currentRank.level} / ${rankInfo.levels}`;
     
     const percentLabel = document.createElement('span');
     percentLabel.textContent = `${Math.round(overallProgressPercent)}%`;
     
-    progressLabels.appendChild(progressLabel);
+    progressLabels.appendChild(levelLabel);
     progressLabels.appendChild(percentLabel);
     
     progressContainer.appendChild(progressLabels);
