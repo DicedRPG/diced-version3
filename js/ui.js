@@ -850,9 +850,10 @@ const UIManager = (() => {
                 case 'flavor': icon = '🌶️'; break;
                 case 'management': icon = '⏱️'; break;
             }
-            
+
+            // <span class="attribute-icon ${attrName}-icon">${icon}</span>
             attrHeader.innerHTML = `
-                <span class="attribute-icon ${attrName}-icon">${icon}</span>
+                <span class="attribute-icon ${attrName}-icon"></span>
                 <h4>${attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h4>
             `;
             
