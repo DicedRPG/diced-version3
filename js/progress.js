@@ -1,58 +1,28 @@
 /**
  * progress.js - Handles all progression and ranking functionality
- * This file manages the user's progress through the game, including attribute leveling
- * and rank advancement.
+ * This file serves as a bridge between the application and the ProgressionSystem module.
+ * It maintains the same API as the previous version while using the new progression system.
  */
 
 // Progress manager namespace
 const ProgressManager = (() => {
-    // Define the rank progression system
-    const RANK_PROGRESSION = {
-        "Home Cook": {
-            color: "Bronze",
-            levels: 9,
-            hoursPerLevel: [5, 5, 5, 5, 5, 6, 7, 8, 9], // Hours needed for each level
-            totalHours: 55,
-            nextRank: "Culinary Student"
-        },
-        "Culinary Student": {
-            color: "Iron",
-            levels: 9,
-            hoursPerLevel: [10, 11, 13, 15, 17, 19, 21, 23, 25],
-            totalHours: 209,
-            nextRank: "Kitchen Assistant"
-        },
-        "Kitchen Assistant": {
-            color: "Silver",
-            levels: 10,
-            hoursPerLevel: [60, 65, 70, 75, 80, 85, 90, 95, 100, 105],
-            totalHours: 825,
-            nextRank: "Line Cook"
-        },
-        "Line Cook": {
-            color: "Gold",
-            levels: 10,
-            hoursPerLevel: [110, 115, 120, 125, 130, 135, 140, 145, 150, 155],
-            totalHours: 1325,
-            nextRank: "Sous Chef"
-        },
-        "Sous Chef": {
-            color: "Platinum",
-            levels: 10,
-            hoursPerLevel: [160, 165, 170, 175, 180, 185, 190, 195, 200, 205],
-            totalHours: 1825,
-            nextRank: "Head Chef"
-        },
-        "Head Chef": {
-            color: "Master",
-            levels: 10,
-            hoursPerLevel: [210, 215, 220, 225, 230, 235, 240, 245, 250, 255],
-            totalHours: 2325,
-            nextRank: null
-        }
-    };
+    // Define the rank progression system by referencing ProgressionSystem
+    // This maintains backward compatibility with existing code
+    const RANK_PROGRESSION = {};
     
-    // Define the technique categories
+    // Initialize RANK_PROGRESSION from ProgressionSystem.RANKS
+    Object.keys(ProgressionSystem.RANKS).forEach(rankTitle => {
+        const rankData = ProgressionSystem.RANKS[rankTitle];
+        RANK_PROGRESSION[rankTitle] = {
+            color: rankData.color,
+            levels: rankData.levels,
+            hoursPerLevel: [...rankData.levelHours], // Clone the array
+            totalHours: rankData.attributeHoursRequired,
+            nextRank: rankData.nextRank
+        };
+    });
+    
+    // Define the technique categories (this is unchanged from the original)
     const TECHNIQUE_CATEGORIES = {
         "Knife Skills": {
             icon: "🔪",
@@ -83,20 +53,24 @@ const ProgressManager = (() => {
      * @returns {number} - Total hours needed
      */
     function calculateHoursToLevel(rankTitle, targetLevel) {
-        const rankInfo = RANK_PROGRESSION[rankTitle];
+        // Use ProgressionSystem's function for this calculation
+        const totalHoursPreviousRanks = ProgressionSystem.getTotalHoursForRank(rankTitle);
         
-        if (!rankInfo) {
+        // Get the rank data
+        const rankData = ProgressionSystem.RANKS[rankTitle];
+        
+        if (!rankData) {
             console.error(`Rank information not found for ${rankTitle}`);
             return 0;
         }
         
-        // Sum up hours for all levels up to target
-        let totalHours = 0;
-        for (let i = 0; i < targetLevel && i < rankInfo.hoursPerLevel.length; i++) {
-            totalHours += rankInfo.hoursPerLevel[i];
+        // Sum up hours for all levels up to target within the current rank
+        let totalHoursWithinRank = 0;
+        for (let i = 0; i < targetLevel && i < rankData.levelHours.length; i++) {
+            totalHoursWithinRank += rankData.levelHours[i];
         }
         
-        return totalHours;
+        return totalHoursPreviousRanks + totalHoursWithinRank;
     }
     
     /**
@@ -126,14 +100,8 @@ const ProgressManager = (() => {
      * @returns {boolean} - Whether the attribute can level up
      */
     function canLevelUp(attribute, rankTitle) {
-        const rankInfo = RANK_PROGRESSION[rankTitle];
-        
-        if (!rankInfo) {
-            return false;
-        }
-        
-        return attribute.totalHours >= attribute.hoursToNextLevel && 
-               attribute.currentLevel <= rankInfo.levels;
+        // Just use the hoursToNextLevel directly from the attribute
+        return attribute.totalHours >= attribute.hoursToNextLevel;
     }
     
     /**
@@ -142,17 +110,7 @@ const ProgressManager = (() => {
      * @returns {boolean} - Whether the user can rank up
      */
     function canRankUp(userProfile) {
-        const currentRank = userProfile.currentRank.title;
-        const rankInfo = RANK_PROGRESSION[currentRank];
-        
-        if (!rankInfo || !rankInfo.nextRank) {
-            return false;
-        }
-        
-        // Check if all attributes have reached max level for this rank
-        return Object.values(userProfile.attributes).every(
-            attr => attr.currentLevel > rankInfo.levels
-        );
+        return ProgressionSystem.canAdvanceToNextRank(userProfile);
     }
     
     /**
@@ -205,10 +163,10 @@ const ProgressManager = (() => {
         const currentLevel = userProfile.currentRank.level;
         
         // Get unlocked, not completed quests
-        const availableQuests = userProfile.unlockedQuests
-            .filter(id => !userProfile.completedQuests.includes(id))
-            .map(id => quests.find(q => q.id === id))
-            .filter(q => q !== undefined);
+        const availableQuests = quests.filter(q => 
+            userProfile.unlockedQuests.includes(q.id) && 
+            !userProfile.completedQuests.includes(q.id)
+        );
         
         // Filter quests by rank and level
         const appropriateQuests = availableQuests.filter(quest => 
@@ -221,7 +179,8 @@ const ProgressManager = (() => {
             "training": 0,
             "side": 1,
             "main": 2,
-            "explore": 3
+            "explore": 3,
+            "challenge": 4
         };
         
         appropriateQuests.sort((a, b) => {
@@ -231,7 +190,7 @@ const ProgressManager = (() => {
             }
             
             // Then by quest type
-            return questTypeOrder[a.type] - questTypeOrder[b.type];
+            return (questTypeOrder[a.type] || 5) - (questTypeOrder[b.type] || 5);
         });
         
         return appropriateQuests.slice(0, count);
@@ -259,7 +218,7 @@ const ProgressManager = (() => {
         }
     }
     
-    // Public API
+    // Public API - maintain the same interface as the original for compatibility
     return {
         RANK_PROGRESSION,
         TECHNIQUE_CATEGORIES,
