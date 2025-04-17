@@ -148,7 +148,7 @@ const UIManager = (() => {
      */
     function updateRankDisplay(userProfile) {
         if (elements.rankDisplay) {
-            elements.rankDisplay.textContent = `${userProfile.currentRank.title} (${userProfile.currentRank.color}) • Level ${userProfile.currentRank.level}`;
+            elements.rankDisplay.textContent = `${userProfile.currentRank.title} (${userProfile.currentRank.color})`;
         }
     }
     
