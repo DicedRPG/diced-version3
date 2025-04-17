@@ -838,7 +838,8 @@
     display: flex;
     margin: 1.5rem 0;
     position: relative;
-    height: 70px;
+    height: 80px;
+    align-items: center;
 }
 
 .rank-icon {
