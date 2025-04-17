@@ -825,12 +825,6 @@
     margin-bottom: 0.3rem;
 }
 
-.quest-type {
-    margin: 0;
-    font-size: 0.8rem;
-    color: #666;
-}
-
 .no-quests-message {
     text-align: center;
     color: #666;
