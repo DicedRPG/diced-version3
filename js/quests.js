@@ -1,7 +1,7 @@
 /**
  * quests.js - Handles all quest-related functionality
  * This file manages quest completion, quest selection, and other quest-related operations.
- * Updated with ProgressManager integration.
+ * Updated to integrate with the new ProgressionSystem.
  */
 
 // Quest manager namespace
@@ -95,7 +95,8 @@ const QuestManager = (() => {
     }
     
     /**
-     * Get appropriate quests for the current user level using ProgressManager
+     * Get appropriate quests for the current user level
+     * Uses ProgressManager to determine appropriate quests
      * @param {Object} userProfile - The user profile
      * @param {number} count - The number of quests to return
      * @returns {Array} - Array of appropriate quests
@@ -118,16 +119,20 @@ const QuestManager = (() => {
      * @param {Object} userProfile - The user profile
      * @returns {Promise<Object|null>} - Promise resolving to the next challenge quest or null
      */
-    function getNextChallengeQuest(userProfile) {
+    async function getNextChallengeQuest(userProfile) {
         if (!userProfile) {
             console.error('User profile is required for getNextChallengeQuest');
             return Promise.resolve(null);
         }
         
         // Get all quests
-        return DataManager.getQuestData().then(quests => {
+        try {
+            const quests = await DataManager.getQuestData();
             return ProgressManager.getNextChallengeQuest(userProfile, quests);
-        });
+        } catch (error) {
+            console.error('Error getting next challenge quest:', error);
+            return null;
+        }
     }
     
     /**
@@ -141,10 +146,20 @@ const QuestManager = (() => {
     
     /**
      * Set the current selected quest
-     * @param {string} questId - The quest ID
+     * @param {string|Object} quest - The quest ID or quest object
      */
-    function setCurrentQuest(questId) {
-        currentQuestId = questId;
+    function setCurrentQuest(quest) {
+        if (!quest) {
+            currentQuestId = null;
+            return;
+        }
+        
+        // If an object is passed, extract the ID
+        if (typeof quest === 'object') {
+            currentQuestId = quest.id;
+        } else {
+            currentQuestId = quest;
+        }
     }
     
     /**
@@ -160,7 +175,7 @@ const QuestManager = (() => {
     }
     
     /**
-     * Format time required for a quest using ProgressManager
+     * Format time required for a quest
      * @param {number} minutes - Time in minutes
      * @returns {string} - Formatted time string
      */
@@ -169,7 +184,7 @@ const QuestManager = (() => {
     }
     
     /**
-     * Calculate total hours earned from a quest using ProgressManager
+     * Calculate total hours earned from a quest
      * @param {Object} quest - The quest object
      * @returns {number} - Total hours earned
      */
@@ -359,18 +374,17 @@ const QuestManager = (() => {
         getCompletedQuests,
         getQuestsByType,
         getQuestsByLevel,
+        getAppropriateQuests,
+        getNextChallengeQuest,
         completeQuest,
         setCurrentQuest,
         getCurrentQuest,
-        generateRandomElement,
-        getQuestTypeInfo,
-        // New functions with ProgressManager integration
-        getAppropriateQuests,
-        getNextChallengeQuest,
         formatTimeRequired,
         calculateQuestHours,
         isQuestAppropriate,
         getQuestDifficulty,
+        generateRandomElement,
+        getQuestTypeInfo,
         getQuestRewardsText,
         getQuestsByAttributeFocus
     };
