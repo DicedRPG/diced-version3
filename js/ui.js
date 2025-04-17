@@ -1349,48 +1349,6 @@ function createSkillConnections(userProfile) {
     });
 }
 
-/**
- * Create a visual connection line between two skill nodes
- * @param {HTMLElement} fromNode - Starting node
- * @param {HTMLElement} toNode - Ending node
- * @param {boolean} mastered - Whether the prerequisite is mastered
- */
-function createConnectionLine(fromNode, toNode, mastered) {
-    // Get positions
-    const fromRect = fromNode.getBoundingClientRect();
-    const toRect = toNode.getBoundingClientRect();
-    
-    // Calculate positions relative to skills container
-    const container = document.getElementById('skills-container');
-    const containerRect = container.getBoundingClientRect();
-    
-    const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
-    const fromY = fromRect.top + fromRect.height - containerRect.top;
-    const toX = toRect.left + toRect.width / 2 - containerRect.left;
-    const toY = toRect.top - containerRect.top;
-    
-    // Create connection element
-    const connection = document.createElement('div');
-    connection.className = `skill-connection ${mastered ? 'mastered' : ''}`;
-    
-    // Calculate length and angle
-    const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
-    const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
-    
-    // Set position and dimensions
-    connection.style.position = 'absolute';
-    connection.style.width = `${length}px`;
-    connection.style.height = '2px';
-    connection.style.left = `${fromX}px`;
-    connection.style.top = `${fromY}px`;
-    connection.style.transform = `rotate(${angle}deg)`;
-    connection.style.transformOrigin = '0 0';
-    connection.style.backgroundColor = mastered ? 'var(--primary-color)' : '#ccc';
-    connection.style.zIndex = '0';
-    
-    // Add to container
-    container.appendChild(connection);
-}
 
 /**
  * Open skill detail modal
