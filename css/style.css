@@ -850,8 +850,8 @@
     align-items: center;
     font-size: 1.2rem;
     font-weight: bold;
-    border-radius: 50%;
-    background-color: var(--secondary-color);
+    /* border-radius: 50%; */
+    /* background-color: var(--secondary-color); */
     margin-right: 10px;
     z-index: 1;
 }
@@ -862,7 +862,7 @@
 }
 
 .rank-icon.current {
-    border: 3px solid var(--accent-color-1);
+    background-image: url('../src/icon-50x50.png');
 }
 
 .rank-label {
