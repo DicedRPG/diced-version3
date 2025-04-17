@@ -865,6 +865,11 @@
     background-image: url('../src/icon-50x50.png');
 }
 
+.rank-icon.next {
+    background-image: url('../src/icon-50x50.png');
+}
+   
+
 .rank-label {
     position: absolute;
     bottom: 0;
