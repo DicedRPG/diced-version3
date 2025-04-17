@@ -850,44 +850,72 @@
     align-items: center;
     font-size: 1.2rem;
     font-weight: bold;
-    /* border-radius: 50%; */
-    /* background-color: var(--secondary-color); */
     margin-right: 10px;
     z-index: 1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.rank-icon.active {
+/* Style for previous ranks (completed) */
+.rank-icon.previous {
+    opacity: 0.85; /* Slightly dim previous ranks */
+    /* Optional: Add a completion indicator */
+    position: relative;
+}
+
+.rank-icon.previous::after {
+    content: "✓";
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
     background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: white;
+    font-size: 12px;
 }
 
+/* Style for current rank */
 .rank-icon.current {
-    background-image: url('../src/icon-50x50.png');
+    /* Make current rank stand out */
+    transform: scale(1.1);
+    border: 2px solid var(--primary-color);
 }
 
+/* Style for next ranks (locked) */
 .rank-icon.next {
-    background-image: url('../src/icon-50x50.png');
+    opacity: 0.6; /* Dim future ranks */
+    filter: grayscale(50%); /* Optional: Make future ranks grayscale */
 }
-   
 
 .rank-label {
     position: absolute;
-    bottom: 0;
+    bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.7rem;
     white-space: nowrap;
+    color: var(--dark-text);
 }
 
-.rank-connector {
-    flex: 1;
-    height: 4px;
+/* Add a connector line between ranks */
+.rank-icon + .rank-icon::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    height: 2px;
+    width: 10px;
     background-color: var(--secondary-color);
-    align-self: center;
-    position: relative;
 }
 
-.rank-connector.active {
+/* Change connector color for completed ranks */
+.rank-icon.previous + .rank-icon::before {
     background-color: var(--primary-color);
 }
 
