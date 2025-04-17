@@ -1170,12 +1170,397 @@ function renderProgressTab(userProfile) {
     statsSection.appendChild(statsGrid);
     progressTab.appendChild(statsSection);
 }
+
+    /**
+ * Render the skills tab
+ * @param {Object} userProfile - The user profile
+ */
+function renderSkillsTab(userProfile) {
+    // Get the skills container
+    const skillsContainer = document.getElementById('skills-container');
+    if (!skillsContainer) return;
+    
+    // Clear existing content
+    skillsContainer.innerHTML = '';
+    
+    // Get skill tree data
+    const skillTreeData = SkillsManager.generateSkillTreeData(userProfile);
+    
+    // Render category filters
+    renderCategoryFilters(Object.keys(skillTreeData));
+    
+    // Render each category
+    Object.entries(skillTreeData).forEach(([categoryName, categoryData]) => {
+        const categorySection = document.createElement('div');
+        categorySection.className = 'skill-category';
+        categorySection.id = `category-${categoryName.toLowerCase().replace(/\s+/g, '-')}`;
+        
+        // Create category header
+        const categoryHeader = document.createElement('div');
+        categoryHeader.className = 'category-header';
+        categoryHeader.innerHTML = `
+            <span class="category-icon">${categoryData.icon}</span>
+            <h3 class="category-name">${categoryName}</h3>
+        `;
+        
+        categorySection.appendChild(categoryHeader);
+        
+        // Create category description
+        const categoryDescription = document.createElement('p');
+        categoryDescription.className = 'category-description';
+        categoryDescription.textContent = categoryData.description;
+        categorySection.appendChild(categoryDescription);
+        
+        // Create difficulty sections
+        Object.entries(categoryData.skills).forEach(([difficulty, skills]) => {
+            if (skills.length === 0) return;
+            
+            const difficultySection = document.createElement('div');
+            difficultySection.className = 'difficulty-section';
+            
+            // Difficulty title
+            const difficultyTitle = document.createElement('h4');
+            difficultyTitle.className = 'difficulty-title';
+            difficultyTitle.textContent = `${difficulty}`;
+            difficultySection.appendChild(difficultyTitle);
+            
+            // Create skill tree
+            const skillTree = document.createElement('div');
+            skillTree.className = 'skill-tree';
+            
+            // Add skills to tree
+            skills.forEach(skill => {
+                const skillNode = document.createElement('div');
+                skillNode.className = `skill-node ${skill.mastered ? 'mastered' : skill.available ? 'available' : 'locked'}`;
+                skillNode.setAttribute('data-skill-id', skill.id);
+                skillNode.setAttribute('data-prerequisites', JSON.stringify(skill.prerequisites || []));
+                
+                skillNode.innerHTML = `
+                    <div class="skill-icon">${skill.icon || '🔪'}</div>
+                    <div class="skill-name">${skill.name}</div>
+                    ${skill.mastered ? '<div class="mastery-badge">✓</div>' : ''}
+                `;
+                
+                // Add click handler for skill details
+                if (skill.mastered || skill.available) {
+                    skillNode.addEventListener('click', () => openSkillDetail(skill.id, userProfile));
+                }
+                
+                skillTree.appendChild(skillNode);
+            });
+            
+            difficultySection.appendChild(skillTree);
+            categorySection.appendChild(difficultySection);
+        });
+        
+        skillsContainer.appendChild(categorySection);
+    });
+    
+    // Create connections between prerequisite skills (after all nodes are added to DOM)
+    setTimeout(() => createSkillConnections(userProfile), 100);
+}
+
+/**
+ * Render category filter buttons
+ * @param {Array} categories - Category names
+ */
+function renderCategoryFilters(categories) {
+    const filterContainer = document.querySelector('.category-filters');
+    if (!filterContainer) return;
+    
+    // Clear existing filters
+    filterContainer.innerHTML = '';
+    
+    // Add "All" filter
+    const allFilter = document.createElement('button');
+    allFilter.className = 'category-filter active';
+    allFilter.textContent = 'All';
+    allFilter.addEventListener('click', () => filterSkillsByCategory('all'));
+    filterContainer.appendChild(allFilter);
+    
+    // Add category filters
+    categories.forEach(category => {
+        const filter = document.createElement('button');
+        filter.className = 'category-filter';
+        filter.textContent = category;
+        filter.addEventListener('click', () => filterSkillsByCategory(category));
+        filterContainer.appendChild(filter);
+    });
+}
+
+/**
+ * Filter skills by category
+ * @param {string} category - Category to filter by
+ */
+function filterSkillsByCategory(category) {
+    // Update active filter
+    document.querySelectorAll('.category-filter').forEach(filter => {
+        filter.classList.toggle('active', filter.textContent === category || (category === 'all' && filter.textContent === 'All'));
+    });
+    
+    // Show/hide categories
+    document.querySelectorAll('.skill-category').forEach(categorySection => {
+        if (category === 'all') {
+            categorySection.style.display = 'block';
+        } else {
+            const categoryName = categorySection.querySelector('.category-name').textContent;
+            categorySection.style.display = categoryName === category ? 'block' : 'none';
+        }
+    });
+}
+
+/**
+ * Create visual connections between prerequisite skills
+ * @param {Object} userProfile - The user profile
+ */
+function createSkillConnections(userProfile) {
+    // Remove any existing connections
+    document.querySelectorAll('.skill-connection').forEach(conn => conn.remove());
+    
+    // Get all skill nodes
+    const skillNodes = document.querySelectorAll('.skill-node');
+    
+    // Process each node
+    skillNodes.forEach(node => {
+        const skillId = node.getAttribute('data-skill-id');
+        let prerequisites;
+        
+        try {
+            prerequisites = JSON.parse(node.getAttribute('data-prerequisites') || '[]');
+        } catch (e) {
+            prerequisites = [];
+        }
+        
+        // Skip if no prerequisites
+        if (!prerequisites || prerequisites.length === 0) return;
+        
+        // Create connections to each prerequisite
+        prerequisites.forEach(prereqId => {
+            const prereqNode = document.querySelector(`.skill-node[data-skill-id="${prereqId}"]`);
+            if (!prereqNode) return;
+            
+            // Create connection line
+            createConnectionLine(
+                prereqNode, 
+                node, 
+                SkillsManager.isTechniqueMastered(prereqId, userProfile)
+            );
+        });
+    });
+}
+
+/**
+ * Create a visual connection line between two skill nodes
+ * @param {HTMLElement} fromNode - Starting node
+ * @param {HTMLElement} toNode - Ending node
+ * @param {boolean} mastered - Whether the prerequisite is mastered
+ */
+function createConnectionLine(fromNode, toNode, mastered) {
+    // Get positions
+    const fromRect = fromNode.getBoundingClientRect();
+    const toRect = toNode.getBoundingClientRect();
+    
+    // Calculate positions relative to skills container
+    const container = document.getElementById('skills-container');
+    const containerRect = container.getBoundingClientRect();
+    
+    const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+    const fromY = fromRect.top + fromRect.height - containerRect.top;
+    const toX = toRect.left + toRect.width / 2 - containerRect.left;
+    const toY = toRect.top - containerRect.top;
+    
+    // Create connection element
+    const connection = document.createElement('div');
+    connection.className = `skill-connection ${mastered ? 'mastered' : ''}`;
+    
+    // Calculate length and angle
+    const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+    const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+    
+    // Set position and dimensions
+    connection.style.position = 'absolute';
+    connection.style.width = `${length}px`;
+    connection.style.height = '2px';
+    connection.style.left = `${fromX}px`;
+    connection.style.top = `${fromY}px`;
+    connection.style.transform = `rotate(${angle}deg)`;
+    connection.style.transformOrigin = '0 0';
+    connection.style.backgroundColor = mastered ? 'var(--primary-color)' : '#ccc';
+    connection.style.zIndex = '0';
+    
+    // Add to container
+    container.appendChild(connection);
+}
+
+/**
+ * Open skill detail modal
+ * @param {string} skillId - Skill ID to display
+ * @param {Object} userProfile - User profile
+ */
+function openSkillDetail(skillId, userProfile) {
+    // Get skill data
+    const techniques = SkillsManager.getAllTechniques();
+    const skill = techniques[skillId];
+    
+    if (!skill) {
+        console.error(`Skill not found: ${skillId}`);
+        return;
+    }
+    
+    // Get the modal elements
+    const modal = document.getElementById('skill-detail-modal');
+    const modalTitle = document.getElementById('skill-modal-title');
+    const modalContent = document.getElementById('skill-modal-content');
+    
+    if (!modal || !modalTitle || !modalContent) {
+        console.error('Skill modal elements not found');
+        return;
+    }
+    
+    // Set modal title
+    modalTitle.textContent = skill.name;
+    
+    // Get mastered and available status
+    const isMastered = SkillsManager.isTechniqueMastered(skillId, userProfile);
+    const isAvailable = SkillsManager.isTechniqueAvailable(skillId, userProfile);
+    
+    // Generate prerequisites HTML
+    let prerequisitesHtml = '';
+    if (skill.prerequisites && skill.prerequisites.length > 0) {
+        prerequisitesHtml = `
+            <h3>Prerequisites:</h3>
+            <ul class="prerequisites-list">
+                ${skill.prerequisites.map(prereqId => {
+                    const prereq = techniques[prereqId];
+                    const completed = SkillsManager.isTechniqueMastered(prereqId, userProfile);
+                    return `
+                        <li class="prerequisite-item">
+                            <div class="prerequisite-icon ${completed ? 'completed' : 'missing'}">
+                                ${completed ? '✓' : ''}
+                            </div>
+                            ${prereq ? prereq.name : prereqId}
+                        </li>
+                    `;
+                }).join('')}
+            </ul>
+        `;
+    }
+    
+    // Generate unlocked by HTML
+    let unlockedByHtml = '';
+    if (skill.unlockedBy && skill.unlockedBy.length > 0) {
+        // Get quest data to get quest names
+        DataManager.getQuestData().then(quests => {
+            const questMap = {};
+            quests.forEach(quest => {
+                questMap[quest.id] = quest;
+            });
+            
+            unlockedByHtml = `
+                <h3>Unlocked by Quests:</h3>
+                <ul class="quests-list">
+                    ${skill.unlockedBy.map(questId => {
+                        const quest = questMap[questId];
+                        return `<li>${quest ? quest.title : questId}</li>`;
+                    }).join('')}
+                </ul>
+            `;
+            
+            // Complete the modal content with quest info
+            completeModalContent();
+        });
+    } else {
+        // Complete the modal content without quest info
+        completeModalContent();
+    }
+    
+    function completeModalContent() {
+        // Set modal content
+        modalContent.innerHTML = `
+            <p><strong>Category:</strong> ${skill.category}</p>
+            <p><strong>Difficulty:</strong> ${skill.difficulty}</p>
+            <p><strong>Description:</strong> ${skill.description}</p>
+            
+            ${prerequisitesHtml}
+            ${unlockedByHtml}
+            
+            ${isMastered 
+                ? '<p class="success-message"><strong>✓ You have mastered this skill!</strong></p>' 
+                : isAvailable
+                    ? '<button id="learn-skill-button" class="skill-learn-button">Learn Skill</button>'
+                    : '<p class="locked-message">This skill is not yet available. Complete the prerequisites first.</p>'
+            }
+        `;
+        
+        // Add event listener to learn button if available
+        const learnButton = document.getElementById('learn-skill-button');
+        if (learnButton) {
+            learnButton.addEventListener('click', () => {
+                learnSkill(skillId, userProfile);
+            });
+        }
+    }
+    
+    // Show the modal
+    modal.style.display = 'flex';
+}
+
+/**
+ * Close skill detail modal
+ */
+function closeSkillDetail() {
+    const modal = document.getElementById('skill-detail-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+/**
+ * Learn a new skill
+ * @param {string} skillId - Skill ID to learn
+ * @param {Object} userProfile - User profile
+ */
+function learnSkill(skillId, userProfile) {
+    // Check if skill is available
+    if (!SkillsManager.isTechniqueAvailable(skillId, userProfile)) {
+        console.error(`Skill not available: ${skillId}`);
+        return;
+    }
+    
+    // Get skill data
+    const techniques = SkillsManager.getAllTechniques();
+    const skill = techniques[skillId];
+    
+    if (!skill) {
+        console.error(`Skill not found: ${skillId}`);
+        return;
+    }
+    
+    // Add to mastered techniques 
+    DataManager.addMasteredTechnique(skillId);
+    
+    // Close the modal
+    closeSkillDetail();
+    
+    // Show notification if UIManager has a showNotification method
+    if (typeof UIManager !== 'undefined' && typeof UIManager.showNotification === 'function') {
+        UIManager.showNotification(`Skill mastered: ${skill.name}`);
+    }
+    
+    // Refresh skills tab
+    renderSkillsTab(DataManager.getUserProfile());
+}
     
     // Define global functions needed by HTML
     window.openQuestDetail = openQuestDetail;
     window.closeQuestDetail = closeQuestDetail;
     window.toggleSection = toggleSection;
     window.hideNotification = hideNotification;
+    window.openSkillDetail = function(skillId) {
+    const userProfile = DataManager.getUserProfile();
+    openSkillDetail(skillId, userProfile);
+};
+    window.closeSkillDetail = closeSkillDetail;
     
     // Public API
     return {
@@ -1183,14 +1568,6 @@ function renderProgressTab(userProfile) {
         refreshUI,
         showNotification,
         renderProgressTab,
-        renderSkillsTab: function(userProfile) {
-            // This is a placeholder if you haven't implemented renderSkillsTab yet
-            if (typeof renderSkillsTab === 'function') {
-                return renderSkillsTab(userProfile);
-            } else {
-                console.warn('renderSkillsTab function not implemented');
-                return null;
-            }
-        }
+        renderSkillsTab: 
     };
 })();
