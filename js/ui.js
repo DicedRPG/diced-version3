@@ -681,36 +681,59 @@ function renderProgressTab(userProfile) {
     }
     
     // Get rank names and create visualization
-    const rankNames = Object.keys(ProgressionSystem.RANKS);
-    const currentRankIndex = rankNames.indexOf(currentRank);
-    
-    // Create rank visualization
-    const rankViz = document.createElement('div');
-    rankViz.className = 'rank-progress-visualization';
-    
-    // Determine how many ranks to show (max 4)
-    const maxRanksToShow = 3;
-    let startRank = Math.max(0, currentRankIndex - 1);
-    let endRank = Math.min(rankNames.length - 1, startRank + maxRanksToShow - 1);
-    
-    // Adjust start rank if we're near the end
-    if (endRank - startRank < maxRanksToShow - 1) {
-        startRank = Math.max(0, endRank - (maxRanksToShow - 1));
-    }
-    
-    // Create rank icons and connectors
-    for (let i = startRank; i <= endRank; i++) {
-        const rankName = rankNames[i];
-        const rankData = ProgressionSystem.RANKS[rankName];
-        
-        // Create rank icon
-        const rankIcon = document.createElement('div');
-        rankIcon.className = 'rank-icon';
-        if (i < currentRankIndex) rankIcon.classList.add('active');
-        if (i === currentRankIndex) rankIcon.classList.add('current');
-        if (i > currentRankIndex) rankIcon.classList.add('next');
+const rankNames = Object.keys(ProgressionSystem.RANKS);
+const currentRankIndex = rankNames.indexOf(currentRank);
 
-        rankViz.appendChild(rankIcon);
+// Create rank visualization
+const rankViz = document.createElement('div');
+rankViz.className = 'rank-progress-visualization';
+
+// Determine how many ranks to show (max 4)
+const maxRanksToShow = 3;
+let startRank = Math.max(0, currentRankIndex - 1);
+let endRank = Math.min(rankNames.length - 1, startRank + maxRanksToShow - 1);
+
+// Adjust start rank if we're near the end
+if (endRank - startRank < maxRanksToShow - 1) {
+    startRank = Math.max(0, endRank - (maxRanksToShow - 1));
+}
+
+// Define rank icon mapping (rank name to image path)
+const rankIconMapping = {
+    "Home Cook": "../src/icon-bronze-50x50.png",
+    "Culinary Student": "../src/icon-iron-50x50.png",
+    "Kitchen Assistant": "../src/icon-silver-50x50.png",
+    "Line Cook": "../src/icon-gold-50x50.png",
+    "Sous Chef": "../src/icon-platinum-50x50.png",
+    "Head Chef": "../src/icon-master-50x50.png"
+};
+
+// Create rank icons and connectors
+for (let i = startRank; i <= endRank; i++) {
+    const rankName = rankNames[i];
+    const rankData = ProgressionSystem.RANKS[rankName];
+    const iconPath = rankIconMapping[rankName] || "../src/icon-default-50x50.png";
+    
+    // Create rank icon
+    const rankIcon = document.createElement('div');
+    rankIcon.className = 'rank-icon';
+    
+    // Set the appropriate icon image based on rank
+    rankIcon.style.backgroundImage = `url('${iconPath}')`;
+    rankIcon.style.backgroundSize = 'cover';
+    
+    // Apply status classes
+    if (i < currentRankIndex) rankIcon.classList.add('previous');
+    if (i === currentRankIndex) rankIcon.classList.add('current');
+    if (i > currentRankIndex) rankIcon.classList.add('next');
+    
+    // Add the rank name as a label
+    const rankLabel = document.createElement('span');
+    rankLabel.className = 'rank-label';
+    rankLabel.textContent = rankName;
+    rankIcon.appendChild(rankLabel);
+    
+    rankViz.appendChild(rankIcon);
         // Add rank label
         //const rankLabel = document.createElement('span');
         //rankLabel.className = 'rank-label';
