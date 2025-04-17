@@ -761,7 +761,7 @@ function renderProgressTab(userProfile) {
     const percentLabel = document.createElement('span');
     percentLabel.textContent = `${Math.round(overallProgressPercent)}%`;
     
-    progressLabels.appendChild(levelLabel);
+    progressLabels.appendChild(progressLabel);
     progressLabels.appendChild(percentLabel);
     
     progressContainer.appendChild(progressLabels);
