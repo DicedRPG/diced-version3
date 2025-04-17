@@ -718,7 +718,7 @@ const UIManager = (() => {
             // rankLabel.textContent = rankName;
             // rankIcon.appendChild(rankLabel);
             
-            // rankViz.appendChild(rankIcon);
+            rankViz.appendChild(rankIcon);
             
             // Add connector if not the last rank
             if (i < endRank) {
