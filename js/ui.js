@@ -730,7 +730,7 @@ function renderProgressTab(userProfile) {
     
     // Add current rank info - now with correct level display from progression system
     const rankTitle = document.createElement('h4');
-    rankTitle.textContent = `${currentRank} (${userProfile.currentRank.color}) • Level ${userProfile.currentRank.level}`;
+    rankTitle.textContent = `${currentRank} (${userProfile.currentRank.color})`;
     rankSection.appendChild(rankTitle);
     
     // Add progress bar - now using the progressPercentage directly from the userProfile
