@@ -1341,11 +1341,11 @@ function createSkillConnections(userProfile) {
             if (!prereqNode) return;
             
             // Create connection line
-            createConnectionLine(
-                prereqNode, 
-                node, 
-                SkillsManager.isTechniqueMastered(prereqId, userProfile)
-            );
+            //createConnectionLine(
+                //prereqNode, 
+                //node, 
+                //SkillsManager.isTechniqueMastered(prereqId, userProfile)
+            //);
         });
     });
 }
