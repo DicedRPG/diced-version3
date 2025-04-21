@@ -1263,12 +1263,14 @@
     /*background-color: rgba(205, 127, 50, 0.3);
     border: 3px solid #cd7f32;*/
     background-image: url('../src/icon-bronze-50x50.png');
+    background-size: cover;
 }
 
 .iron {
     /*background-color: rgba(113, 121, 126, 0.3);
     border: 3px solid #71797E;*/
     background-image: url('../src/icon-iron-50x50.png');
+    background-size: cover;
 }
 
 .silver {
