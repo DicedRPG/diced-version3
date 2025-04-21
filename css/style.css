@@ -131,7 +131,7 @@
         }
         
         .ingredients-icon {
-            background-image: url('../src/icon-iron-50x50.png);
+            background-image: url('../src/icon-iron-50x50.png');
         }
         
         .flavor-icon {
@@ -139,7 +139,7 @@
         }
 
         .management-icon {
-            background-image: url('../src/icon-iron-50x50.png);
+            background-image: url('../src/icon-iron-50x50.png');
         }
         
         .progress-bar {
