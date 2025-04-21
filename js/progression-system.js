@@ -13,7 +13,7 @@ const ProgressionSystem = (() => {
     // Define rank progression data
     const RANKS = {
         "Home Cook": {
-            color: "Bronze",
+            color: "Iron",
             levels: 9,
             nextRank: "Culinary Student",
             attributeHoursRequired: 55, // Total hours per attribute to complete this rank
@@ -21,7 +21,7 @@ const ProgressionSystem = (() => {
             levelHours: [5, 5, 5, 5, 5, 6, 7, 8, 9]
         },
         "Culinary Student": {
-            color: "Iron",
+            color: "Bronze",
             levels: 9,
             nextRank: "Kitchen Assistant",
             attributeHoursRequired: 154, // 55 + 99
