@@ -69,11 +69,31 @@
         </div>
     </div>
     
-    <!-- Journal Tab Content -->
     <div id="journal-tab" class="tab-content hidden">
-        <h2 class="section-title">Cooking Journal</h2>
-        <p>Journal features will be added in a future update.</p>
+    <h2 class="section-title">Cooking Journal</h2>
+    <button class="new-entry-button">+ New Journal Entry</button>
+    
+    <div class="journal-entries" id="journal-entries-container">
+        <!-- Journal entries will be dynamically inserted here -->
+        <div class="no-entries-message">
+            <p>You haven't created any journal entries yet.</p>
+            <p>Complete quests and document your culinary journey!</p>
+        </div>
     </div>
+</div>
+
+<!-- Journal Entry Modal -->
+<div id="journal-entry-modal" class="journal-entry-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="journal-modal-title">Journal Entry</h2>
+            <button class="close-button" onclick="closeJournalEntryModal()">×</button>
+        </div>
+        <div id="journal-modal-content">
+            <!-- Modal content will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
 </div>
 
 <!-- Quest Detail Modal -->
