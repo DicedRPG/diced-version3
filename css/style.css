@@ -127,19 +127,19 @@
         }
         
         .technique-icon {
-            background-image: url('../src/icon-50x50.png');
+            background-image: url('../src/icon-iron-50x50.png');
         }
         
         .ingredients-icon {
-            background-image: url('../src/icon-50x50.png');
+            background-image: url('../src/icon-iron-50x50.png);
         }
         
         .flavor-icon {
-            background-image: url('../src/icon-50x50.png');
+            background-image: url('../src/icon-iron-50x50.png');
         }
 
         .management-icon {
-            background-image: url('../src/icon-50x50.png');
+            background-image: url('../src/icon-iron-50x50.png);
         }
         
         .progress-bar {
@@ -1300,14 +1300,14 @@
 }
 
 /* Knife icon inside hexagon */
-.knife-icon {
+/*.knife-icon {
     width: 40px;
     height: 40px;
     background-image: url('../src/icon-50x50.png'); /* Update this to your knife icon path */
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-}
+}*/
 
 .rank-card-title {
     font-size: 18px;
