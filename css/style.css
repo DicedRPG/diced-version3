@@ -1125,3 +1125,278 @@
         height: 20px;
     }
 }
+
+/* Add this to your css/style.css file */
+
+/* Rank Card Stack Styles */
+.rank-card-stack-container {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    perspective: 1000px;
+    margin: 30px 0;
+    overflow: hidden;
+}
+
+.rank-card-stack {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.rank-card-stack.transitioning .rank-card {
+    transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.rank-card {
+    position: absolute;
+    width: 150px;
+    height: 180px;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    transform-origin: center center;
+    top: 0;
+    left: 50%;
+    cursor: default;
+    overflow: hidden;
+}
+
+/* Card position classes */
+.rank-card-center {
+    transform: translateX(-50%) translateZ(0) scale(1);
+    opacity: 1;
+    cursor: default;
+}
+
+.rank-card-left {
+    transform: translateX(-130%) translateZ(-100px) rotateY(25deg) scale(0.85);
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.rank-card-right {
+    transform: translateX(30%) translateZ(-100px) rotateY(-25deg) scale(0.85);
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.rank-card-far-left {
+    transform: translateX(-180%) translateZ(-200px) rotateY(35deg) scale(0.7);
+    opacity: 0.5;
+}
+
+.rank-card-far-right {
+    transform: translateX(80%) translateZ(-200px) rotateY(-35deg) scale(0.7);
+    opacity: 0.5;
+}
+
+.rank-card-hidden {
+    transform: translateX(-50%) translateZ(-300px) scale(0.5);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Card designs based on rank */
+.rank-card.rank-bronze {
+    background-color: #cd7f32;
+    background-image: linear-gradient(145deg, #e9b37c 0%, #a66a2b 100%);
+    color: white;
+}
+
+.rank-card.rank-iron {
+    background-color: #71797E;
+    background-image: linear-gradient(145deg, #a8a9ad 0%, #515459 100%);
+    color: white;
+}
+
+.rank-card.rank-silver {
+    background-color: #C0C0C0;
+    background-image: linear-gradient(145deg, #e3e3e3 0%, #9a9a9a 100%);
+    color: #333;
+}
+
+.rank-card.rank-gold {
+    background-color: #FFD700;
+    background-image: linear-gradient(145deg, #ffeb7b 0%, #e6b800 100%);
+    color: #333;
+}
+
+.rank-card.rank-platinum {
+    background-color: #E5E4E2;
+    background-image: linear-gradient(145deg, #ffffff 0%, #ceccc8 100%);
+    color: #333;
+}
+
+.rank-card.rank-master {
+    background-color: #4A2A1B;
+    background-image: linear-gradient(145deg, #705040 0%, #2a180e 100%);
+    color: white;
+}
+
+/* Hexagon styles for the rank icon */
+.hexagon-container {
+    margin-bottom: 15px;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.hexagon {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bronze {
+    background-color: rgba(205, 127, 50, 0.3);
+    border: 3px solid #cd7f32;
+}
+
+.iron {
+    background-color: rgba(113, 121, 126, 0.3);
+    border: 3px solid #71797E;
+}
+
+.silver {
+    background-color: rgba(192, 192, 192, 0.3);
+    border: 3px solid #C0C0C0;
+}
+
+.gold {
+    background-color: rgba(255, 215, 0, 0.3);
+    border: 3px solid #FFD700;
+}
+
+.platinum {
+    background-color: rgba(229, 228, 226, 0.3);
+    border: 3px solid #E5E4E2;
+}
+
+.master {
+    background-color: rgba(74, 42, 27, 0.3);
+    border: 3px solid #4A2A1B;
+}
+
+.hexagon-content {
+    width: 90%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Knife icon inside hexagon */
+.knife-icon {
+    width: 40px;
+    height: 40px;
+    background-image: url('../src/icon-50x50.png'); /* Update this to your knife icon path */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.rank-card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.rank-card-subtitle {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+/* Navigation buttons */
+.rank-card-nav {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.rank-nav-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rank-nav-btn:hover {
+    background-color: #8fa749;
+}
+
+.rank-nav-btn.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Completed rank indicator */
+.rank-card.rank-completed::after {
+    content: "✓";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 480px) {
+    .rank-card {
+        width: 130px;
+        height: 160px;
+    }
+    
+    .hexagon-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .knife-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .rank-card-title {
+        font-size: 16px;
+    }
+    
+    .rank-card-subtitle {
+        font-size: 12px;
+    }
+    
+    .rank-card-left {
+        transform: translateX(-120%) translateZ(-100px) rotateY(25deg) scale(0.85);
+    }
+    
+    .rank-card-right {
+        transform: translateX(20%) translateZ(-100px) rotateY(-25deg) scale(0.85);
+    }
+}
