@@ -451,3 +451,28 @@ const JournalManager = (() => {
     window.openNewEntryForm = openNewEntryForm;
     window.closeJournalEntryModal = closeJournalEntryModal;
 })();
+
+// Update app.js initialization
+// This code is meant to extend the existing initialization in app.js
+(function extendAppInitialization() {
+    // Keep track of the original initialize function
+    const originalInitialize = UIManager.initialize;
+    
+    // Replace with enhanced version that includes journal tab
+    UIManager.initialize = function(userProfile, questData) {
+        // Call the original initialize function
+        if (typeof originalInitialize === 'function') {
+            originalInitialize(userProfile, questData);
+        }
+        
+        // Initialize the journal tab when journal tab is clicked
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                const tabName = event.currentTarget.getAttribute('data-tab');
+                if (tabName === 'journal') {
+                    UIManager.renderJournalTab(userProfile);
+                }
+            });
+        });
+    };
+})();
