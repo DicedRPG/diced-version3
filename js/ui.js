@@ -811,91 +811,128 @@ const UIManager = (() => {
     }
 
     /**
-     * Rotate the card stack
-     * @param {number} targetIndex - The target rank index
-     */
-    function rotateCardStack(targetIndex) {
-        const cardStack = document.getElementById('rankCardStack');
-        if (!cardStack) return;
+ * Rotate the card stack
+ * @param {number} targetIndex - The target rank index
+ */
+function rotateCardStack(targetIndex) {
+    const cardStack = document.getElementById('rankCardStack');
+    if (!cardStack) return;
+    
+    // Get all cards
+    const cards = cardStack.querySelectorAll('.rank-card');
+    if (!cards.length) return;
+    
+    // Get current center card index
+    let currentCenterIndex = -1;
+    cards.forEach((card) => {
+        if (card.classList.contains('rank-card-center')) {
+            currentCenterIndex = parseInt(card.getAttribute('data-rank-index'));
+        }
+    });
+    
+    if (currentCenterIndex === -1) return;
+    
+    // Add transition class to enable animations
+    cardStack.classList.add('transitioning');
+    
+    // Update card positions and add/remove click handlers
+    cards.forEach(card => {
+        const cardIndex = parseInt(card.getAttribute('data-rank-index'));
         
-        // Get all cards
-        const cards = cardStack.querySelectorAll('.rank-card');
-        if (!cards.length) return;
+        // Remove existing click handler by cloning the card content
+        const oldHtml = card.innerHTML;
+        card.innerHTML = oldHtml;
         
-        // Get current center card index
-        let currentCenterIndex = -1;
-        cards.forEach((card, index) => {
-            if (card.classList.contains('rank-card-center')) {
-                currentCenterIndex = parseInt(card.getAttribute('data-rank-index'));
-            }
-        });
+        // Remove all position classes
+        card.classList.remove(
+            'rank-card-center', 
+            'rank-card-left', 
+            'rank-card-right',
+            'rank-card-far-left',
+            'rank-card-far-right',
+            'rank-card-hidden'
+        );
         
-        if (currentCenterIndex === -1) return;
+        // Set new position class
+        let newClass = 'rank-card-hidden';
+        let zIndex = 0;
         
-        // Determine rotation direction
-        const direction = targetIndex > currentCenterIndex ? 'right' : 'left';
-        
-        // Add transition class to enable animations
-        cardStack.classList.add('transitioning');
-        
-        // Update card positions
-        cards.forEach(card => {
-            const cardIndex = parseInt(card.getAttribute('data-rank-index'));
-            
-            // Remove all position classes
-            card.classList.remove(
-                'rank-card-center', 
-                'rank-card-left', 
-                'rank-card-right',
-                'rank-card-far-left',
-                'rank-card-far-right',
-                'rank-card-hidden'
-            );
-            
-            // Set new position class
-            let newClass = 'rank-card-hidden';
-            let zIndex = 0;
-            
-            if (cardIndex === targetIndex) {
-                newClass = 'rank-card-center';
-                zIndex = 100;
-            } else if (cardIndex === targetIndex - 1) {
-                newClass = 'rank-card-left';
-                zIndex = 90;
-            } else if (cardIndex === targetIndex + 1) {
-                newClass = 'rank-card-right';
-                zIndex = 90;
-            } else if (cardIndex === targetIndex - 2) {
-                newClass = 'rank-card-far-left';
-                zIndex = 80;
-            } else if (cardIndex === targetIndex + 2) {
-                newClass = 'rank-card-far-right';
-                zIndex = 80;
-            }
-            
-            card.classList.add(newClass);
-            card.style.zIndex = zIndex;
-        });
-        
-        // Update navigation buttons
-        const prevBtn = document.getElementById('prevRankBtn');
-        const nextBtn = document.getElementById('nextRankBtn');
-        const allRanks = Object.keys(ProgressionSystem.RANKS);
-        
-        if (prevBtn) {
-            prevBtn.classList.toggle('disabled', targetIndex === 0);
+        if (cardIndex === targetIndex) {
+            newClass = 'rank-card-center';
+            zIndex = 100;
+            card.style.cursor = 'default';
+        } else if (cardIndex === targetIndex - 1) {
+            newClass = 'rank-card-left';
+            zIndex = 90;
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                rotateCardStack(cardIndex);
+            });
+        } else if (cardIndex === targetIndex + 1) {
+            newClass = 'rank-card-right';
+            zIndex = 90;
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                rotateCardStack(cardIndex);
+            });
+        } else if (cardIndex === targetIndex - 2) {
+            newClass = 'rank-card-far-left';
+            zIndex = 80;
+            card.style.cursor = 'default';
+        } else if (cardIndex === targetIndex + 2) {
+            newClass = 'rank-card-far-right';
+            zIndex = 80;
+            card.style.cursor = 'default';
         }
         
-        if (nextBtn) {
-            nextBtn.classList.toggle('disabled', targetIndex === allRanks.length - 1);
-        }
+        card.classList.add(newClass);
+        card.style.zIndex = zIndex;
+    });
+    
+    // Update navigation buttons
+    const prevBtn = document.getElementById('prevRankBtn');
+    const nextBtn = document.getElementById('nextRankBtn');
+    const allRanks = Object.keys(ProgressionSystem.RANKS);
+    
+    if (prevBtn) {
+        // Remove old event listeners by replacing with a clone
+        const newPrevBtn = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
         
-        // Remove transition class after animation completes
-        setTimeout(() => {
-            cardStack.classList.remove('transitioning');
-        }, 600); // Should match transition duration in CSS
+        // Add new event listener if not at the first rank
+        if (targetIndex > 0) {
+            newPrevBtn.classList.remove('disabled');
+            newPrevBtn.addEventListener('click', function() {
+                rotateCardStack(targetIndex - 1);
+            });
+        } else {
+            newPrevBtn.classList.add('disabled');
+        }
     }
+    
+    if (nextBtn) {
+        // Remove old event listeners by replacing with a clone
+        const newNextBtn = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+        
+        // Add new event listener if not at the last rank
+        if (targetIndex < allRanks.length - 1) {
+            newNextBtn.classList.remove('disabled');
+            newNextBtn.addEventListener('click', function() {
+                rotateCardStack(targetIndex + 1);
+            });
+        } else {
+            newNextBtn.classList.add('disabled');
+        }
+    }
+    
+    // Remove transition class after animation completes
+    setTimeout(() => {
+        cardStack.classList.remove('transitioning');
+    }, 600); // Should match transition duration in CSS
+}
 
+    
     /**
      * Render the progress tab with detailed progression information
      * @param {Object} userProfile - The user profile
