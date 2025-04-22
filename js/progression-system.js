@@ -24,36 +24,36 @@ const ProgressionSystem = (() => {
             color: "Bronze",
             levels: 9,
             nextRank: "Kitchen Assistant",
-            attributeHoursRequired: 154, // 55 + 99
-            levelHours: [10, 11, 12, 13, 14, 15, 16, 17, 18]
+            attributeHoursRequired: 209, // 55 + 154
+            levelHours: [10, 11, 13, 15, 17, 19, 21, 23, 25]
         },
         "Kitchen Assistant": {
             color: "Silver",
             levels: 9,
             nextRank: "Line Cook",
-            attributeHoursRequired: 361, // 55 + 99 + 207
-            levelHours: [19, 20, 21, 22, 23, 24, 25, 26, 27]
+            attributeHoursRequired: 530, // 55 + 209 + 
+            levelHours: [27, 29, 31, 33, 35, 37, 40, 43, 46]
         },
         "Line Cook": {
             color: "Gold",
             levels: 9,
             nextRank: "Sous Chef",
-            attributeHoursRequired: 640, // 55 + 99 + 207 + 279
-            levelHours: [28, 29, 30, 31, 32, 33, 34, 35, 36]
+            attributeHoursRequired: 1177, // 55 + 209 + 530 + 
+            levelHours: [49, 54, 59, 64, 71, 77, 83, 91, 99]
         },
         "Sous Chef": {
             color: "Platinum",
             levels: 9,
             nextRank: "Head Chef",
-            attributeHoursRequired: 991, // 55 + 99 + 207 + 279 + 351
-            levelHours: [37, 38, 39, 40, 41, 42, 45, 48, 51]
+            attributeHoursRequired: 2500, // 55 + 99 + 207 + 279 + 351
+            levelHours: [106, 114, 123, 133, 143, 157, 167, 180, 200]
         },
         "Head Chef": {
             color: "Master",
             levels: 9,
             nextRank: null, // Final rank
-            attributeHoursRequired: 1405, // 55 + 99 + 207 + 279 + 351 + 414
-            levelHours: [52, 56, 60, 65, 70, 75, 80, 85, 90]
+            attributeHoursRequired: 0, // 55 + 99 + 207 + 279 + 351 + 414
+            levelHours: [0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
     };
 
