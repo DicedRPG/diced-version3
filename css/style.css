@@ -845,8 +845,8 @@ header {
 
 .rank-card {
     position: absolute;
-    width: 150px;
-    height: 180px;
+    width: 187.5px;
+    height: 225px;
     border-radius: 12px;
     background-color: #f5f5f5;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
