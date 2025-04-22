@@ -117,8 +117,8 @@ header {
 }
 
 .attribute-icon {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     margin-right: 0.5rem;
     /*background-color: #ccc;*/
     /*border-radius: 50%;*/
@@ -126,19 +126,19 @@ header {
 }
 
 .technique-icon {
-    background-image: url('../src/icon-iron-50x50.png');
+    background-image: url('../src/icon-iron-80x80.png');
 }
 
 .ingredients-icon {
-    background-image: url('../src/icon-iron-50x50.png');
+    background-image: url('../src/icon-iron-80x80.png');
 }
 
 .flavor-icon {
-    background-image: url('../src/icon-iron-50x50.png');
+    background-image: url('../src/icon-iron-80x80.png');
 }
 
 .management-icon {
-    background-image: url('../src/icon-iron-50x50.png');
+    background-image: url('../src/icon-iron-80x80.png');
 }
 
 .progress-bar {
@@ -679,32 +679,32 @@ header {
 /* Base styles for each rank color */
 .rank-icon.rank-bronze {
     background-color: #CD7F32;
-    background-image: url('../src/icon-bronze-50x50.png');
+    background-image: url('../src/icon-bronze-80x80.png');
 }
 
 .rank-icon.rank-iron {
     background-color: #C0C0C0;
-    background-image: url('../src/icon-iron-50x50.png');
+    background-image: url('../src/icon-iron-80x80.png');
 }
 
 .rank-icon.rank-silver {
     background-color: #C0C0C0;
-    background-image: url('../src/icon-silver-50x50.png');
+    background-image: url('../src/icon-silver-80x80.png');
 }
 
 .rank-icon.rank-gold {
     background-color: #FFD700;
-    background-image: url('../src/gold-texture.png');
+    background-image: url('../src/icon-gold-80x80.png');
 }
 
 .rank-icon.rank-platinum {
     background-color: #E5E4E2;
-    background-image: url('../src/platinum-texture.png');
+    background-image: url('../src/icon-platinum-80x80.png');
 }
 
 .rank-icon.rank-master {
     background-color: #B9F2FF;
-    background-image: url('../src/master-texture.png');
+    background-image: url('../src/icon-mythril-80x80.png');
 }
 
 /* Style for active (completed) ranks */
