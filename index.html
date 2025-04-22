@@ -56,44 +56,6 @@
         <h2 class="section-title">Progress Tracking</h2>
         <p>Progress tracking features will be added in a future update.</p>
     </div>
-    
-    <!-- Skills Tab Content -->
-    <div id="skills-tab" class="tab-content hidden">
-        <h2 class="section-title">Cooking Techniques</h2>
-        <div class="category-filters">
-            <!-- Category filter buttons will be added dynamically -->
-        </div>
-        
-        <div id="skills-container">
-            <!-- Skills will be rendered here -->
-        </div>
-    </div>
-    
-    <div id="journal-tab" class="tab-content hidden">
-    <h2 class="section-title">Cooking Journal</h2>
-    <button class="new-entry-button">+ New Journal Entry</button>
-    
-    <div class="journal-entries" id="journal-entries-container">
-        <!-- Journal entries will be dynamically inserted here -->
-        <div class="no-entries-message">
-            <p>You haven't created any journal entries yet.</p>
-            <p>Complete quests and document your culinary journey!</p>
-        </div>
-    </div>
-</div>
-
-<!-- Journal Entry Modal -->
-<div id="journal-entry-modal" class="journal-entry-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="journal-modal-title">Journal Entry</h2>
-            <button class="close-button" onclick="closeJournalEntryModal()">×</button>
-        </div>
-        <div id="journal-modal-content">
-            <!-- Modal content will be dynamically inserted here -->
-        </div>
-    </div>
-</div>
 </div>
 
 <!-- Quest Detail Modal -->
@@ -110,20 +72,6 @@
     </div>
 </div>
 
-<!-- Skill Detail Modal -->
-<div id="skill-detail-modal" class="quest-detail-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="skill-modal-title">Skill Details</h2>
-            <button class="close-button" onclick="closeSkillDetail()">×</button>
-        </div>
-        
-        <div id="skill-modal-content">
-            <!-- Skill details will be dynamically inserted here -->
-        </div>
-    </div>
-</div>
-
     <nav class="nav-tabs">
     <a href="#" class="nav-tab active" data-tab="quests">
         <div class="tab-icon">📋</div>
@@ -132,14 +80,6 @@
     <a href="#" class="nav-tab" data-tab="progress">
         <div class="tab-icon">📊</div>
         Progress
-    </a>
-    <a href="#" class="nav-tab" data-tab="skills">
-        <div class="tab-icon">🍳</div>
-        Skills
-    </a>
-    <a href="#" class="nav-tab" data-tab="journal">
-        <div class="tab-icon">📝</div>
-        Journal
     </a>
 </nav>
 
@@ -229,9 +169,7 @@
     <script src="js/data.js"></script>
     <script src="js/progress.js"></script>
     <script src="js/quests.js"></script>
-    <script src="js/journal.js"></script>
     <script src="js/ui.js"></script>
-    <script src="js/skills.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
