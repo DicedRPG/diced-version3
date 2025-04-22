@@ -1135,49 +1135,6 @@ function renderProgressTab(userProfile) {
     
     progressTab.appendChild(achievementsSection);
 }
-        
-        // ---- OVERALL STATS SECTION ----
-        const statsSection = document.createElement('div');
-        statsSection.className = 'progress-section';
-        
-        // Section header
-        const statsSectionHeader = document.createElement('h3');
-        statsSectionHeader.className = 'section-subtitle';
-        statsSectionHeader.textContent = 'Overall Statistics';
-        statsSection.appendChild(statsSectionHeader);
-        
-        // Create stats grid
-        const statsGrid = document.createElement('div');
-        statsGrid.className = 'stats-cards';
-        
-        // Add stat cards
-        const statsData = [
-            { label: 'Quests Completed', value: userProfile.completedQuests.length },
-            { label: 'Hours Accumulated', value: stats.totalHours.toFixed(1) },
-            { label: 'Current Rank', value: `${userProfile.currentRank.title} ${userProfile.currentRank.level}` }
-        ];
-        
-        statsData.forEach(stat => {
-            const statCard = document.createElement('div');
-            statCard.className = 'stat-card';
-            
-            const statValue = document.createElement('div');
-            statValue.className = 'stat-value';
-            statValue.textContent = stat.value;
-            
-            const statLabel = document.createElement('div');
-            statLabel.className = 'stat-label';
-            statLabel.textContent = stat.label;
-            
-            statCard.appendChild(statValue);
-            statCard.appendChild(statLabel);
-            
-            statsGrid.appendChild(statCard);
-        });
-        
-        statsSection.appendChild(statsGrid);
-        progressTab.appendChild(statsSection);
-    }
     
     // Define global functions needed by HTML
     window.openQuestDetail = openQuestDetail;
