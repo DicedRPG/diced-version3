@@ -1,6 +1,6 @@
 /**
  * data.js - Handles all data loading, caching, and storage functionality
- * Updated to use the new ProgressionSystem for more accurate progression tracking.
+ * Updated to remove skills and journal features.
  */
 
 // Data manager namespace
@@ -41,12 +41,9 @@ const DataManager = (() => {
             ...baseProfile,
             completedQuests: [],
             unlockedQuests: ["T1-1", "T1-2", "T1-3", "T1-6", "T1-7", "T1-8", "S1-1", "S1-5", "S1-6", "S1-7", "M1-1", "M1-4", "M1-5", "E1-1", "E1-3", "E1-4"],
-            masteredTechniques: [],
-            journalEntries: [],
             // Track progression milestones
             milestones: {
                 questsCompleted: 0,
-                techniquesLearned: 0,
                 hoursAccumulated: 0,
                 rankAdvances: 0,
                 levelUps: 0
@@ -76,10 +73,6 @@ const DataManager = (() => {
                 dataStore.userProfile = JSON.parse(storedProfile);
                 
                 // Ensure all required properties exist
-                if (!dataStore.userProfile.masteredTechniques) {
-                    dataStore.userProfile.masteredTechniques = [];
-                }
-                
                 if (!dataStore.userProfile.recentAchievements) {
                     dataStore.userProfile.recentAchievements = [];
                 }
@@ -87,7 +80,6 @@ const DataManager = (() => {
                 if (!dataStore.userProfile.milestones) {
                     dataStore.userProfile.milestones = {
                         questsCompleted: 0,
-                        techniquesLearned: 0,
                         hoursAccumulated: 0,
                         rankAdvances: 0,
                         levelUps: 0
@@ -260,35 +252,11 @@ const DataManager = (() => {
             }
         }
         
-        // Add techniques learned if present
-        let techniquesLearned = 0;
-        if (quest.techniquesLearned && Array.isArray(quest.techniquesLearned)) {
-            quest.techniquesLearned.forEach(technique => {
-                if (!userProfile.masteredTechniques.includes(technique)) {
-                    userProfile.masteredTechniques.push(technique);
-                    techniquesLearned++;
-                    
-                    // Create technique learned achievement
-                    const techniqueAchievement = {
-                        type: 'technique_learned',
-                        timestamp: Date.now(),
-                        techniqueId: technique
-                    };
-                    
-                    userProfile.recentAchievements.unshift(techniqueAchievement);
-                    if (userProfile.recentAchievements.length > 10) {
-                        userProfile.recentAchievements.pop();
-                    }
-                }
-            });
-        }
-        
         // Mark quest as completed
         userProfile.completedQuests.push(questId);
         
         // Update milestone counters
         userProfile.milestones.questsCompleted++;
-        userProfile.milestones.techniquesLearned += techniquesLearned;
         
         // Calculate total hours added
         const totalHoursAdded = Object.values(rewards).reduce((sum, val) => sum + val, 0);
@@ -458,36 +426,6 @@ const DataManager = (() => {
     }
     
     /**
-     * Add a journal entry
-     * @param {string} questId - The ID of the quest
-     * @param {string} content - The journal entry content
-     * @param {Array} photos - Array of photo URLs (optional)
-     * @returns {Object} - Result object with success status and message
-     */
-    function addJournalEntry(questId, content, photos = []) {
-        const userProfile = loadUserProfile();
-        const quest = dataStore.questData?.find(q => q.id === questId);
-        
-        if (!quest) {
-            return { success: false, message: "Quest not found" };
-        }
-        
-        const entry = {
-            id: `journal-${Date.now()}`,
-            date: new Date().toISOString(),
-            questId: questId,
-            questTitle: quest.title,
-            content: content,
-            photos: photos
-        };
-        
-        userProfile.journalEntries.push(entry);
-        saveUserProfile();
-        
-        return { success: true, message: "Journal entry added" };
-    }
-    
-    /**
      * Get user statistics
      * @returns {Object} - User statistics
      */
@@ -513,7 +451,6 @@ const DataManager = (() => {
         
         return {
             questsCompleted: userProfile.completedQuests.length,
-            techniquesLearned: userProfile.masteredTechniques.length,
             totalHours: totalHours,
             avgHoursPerAttribute: totalHours / 4,
             avgLevel: avgLevel,
@@ -532,50 +469,6 @@ const DataManager = (() => {
     function getRecentAchievements(count = 10) {
         const userProfile = loadUserProfile();
         return userProfile.recentAchievements.slice(0, count);
-    }
-    
-    /**
-     * Add a technique to the user's mastered techniques
-     * @param {string} techniqueId - The technique ID
-     * @returns {Object} - Result object with success status and message
-     */
-    function addMasteredTechnique(techniqueId) {
-        const userProfile = loadUserProfile();
-        
-        // Check if technique is already mastered
-        if (userProfile.masteredTechniques.includes(techniqueId)) {
-            return { 
-                success: false, 
-                message: "Technique already mastered" 
-            };
-        }
-        
-        // Add technique
-        userProfile.masteredTechniques.push(techniqueId);
-        
-        // Update milestone counter
-        userProfile.milestones.techniquesLearned++;
-        
-        // Create achievement
-        const achievement = {
-            type: 'technique_learned',
-            timestamp: Date.now(),
-            techniqueId: techniqueId
-        };
-        
-        // Add to recent achievements
-        userProfile.recentAchievements.unshift(achievement);
-        if (userProfile.recentAchievements.length > 10) {
-            userProfile.recentAchievements.pop();
-        }
-        
-        // Save changes
-        saveUserProfile();
-        
-        return { 
-            success: true, 
-            message: "Technique mastered" 
-        };
     }
     
     // Public API
@@ -597,11 +490,9 @@ const DataManager = (() => {
         getQuestData: getQuestData,
         completeQuest: completeQuest,
         updateAttribute: updateAttribute,
-        addJournalEntry: addJournalEntry,
         getRecommendedQuests: getRecommendedQuests,
         resetUserProgress: resetUserProgress,
         getUserStats: getUserStats,
-        getRecentAchievements: getRecentAchievements,
-        addMasteredTechnique: addMasteredTechnique
+        getRecentAchievements: getRecentAchievements
     };
 })();
