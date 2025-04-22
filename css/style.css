@@ -117,8 +117,8 @@ header {
 }
 
 .attribute-icon {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     margin-right: 0.5rem;
     /*background-color: #ccc;*/
     /*border-radius: 50%;*/
@@ -126,19 +126,19 @@ header {
 }
 
 .technique-icon {
-    background-image: url('../src/icon-iron-80x80.png');
+    background-image: url('../src/icon-iron-50x50.png');
 }
 
 .ingredients-icon {
-    background-image: url('../src/icon-iron-80x80.png');
+    background-image: url('../src/icon-iron-50x50.png');
 }
 
 .flavor-icon {
-    background-image: url('../src/icon-iron-80x80.png');
+    background-image: url('../src/icon-iron-50x50.png');
 }
 
 .management-icon {
-    background-image: url('../src/icon-iron-80x80.png');
+    background-image: url('../src/icon-iron-50x50.png');
 }
 
 .progress-bar {
