@@ -1,7 +1,7 @@
 /**
  * ui.js - Handles all user interface interactions
  * This file manages DOM manipulations, rendering, and UI event handling.
- * UPDATED: Skills and Journal features removed
+ * UPDATED: Skills and Journal features removed, Progress tab restored
  */
 
 // UI manager namespace
@@ -603,6 +603,266 @@ const UIManager = (() => {
     }
 
     /**
+     * Create rank cards carousel component
+     * @param {Object} userProfile - The user profile
+     * @returns {HTMLElement} - The carousel section element
+     */
+    function createRankCardsCarousel(userProfile) {
+        // Get current rank from user profile
+        const currentRank = userProfile.currentRank.title;
+        
+        // Get all ranks from progression system
+        const allRanks = Object.keys(ProgressionSystem.RANKS);
+        const currentRankIndex = allRanks.indexOf(currentRank);
+        
+        // Create the carousel container
+        const carouselSection = document.createElement('div');
+        carouselSection.className = 'progress-section';
+        
+        // Add section title
+        const carouselTitle = document.createElement('h3');
+        carouselTitle.className = 'section-subtitle';
+        carouselTitle.textContent = 'Rank Progression';
+        carouselSection.appendChild(carouselTitle);
+        
+        // Create the card stack container
+        const cardStackContainer = document.createElement('div');
+        cardStackContainer.className = 'rank-card-stack-container';
+        
+        // Create the card stack
+        const cardStack = document.createElement('div');
+        cardStack.className = 'rank-card-stack';
+        cardStack.id = 'rankCardStack';
+        
+        // Determine which ranks to display (all ranks)
+        allRanks.forEach((rankName, index) => {
+            const rankData = ProgressionSystem.RANKS[rankName];
+            
+            // Determine card position class
+            let positionClass = 'rank-card-hidden';
+            let zIndex = 0;
+            
+            if (index === currentRankIndex) {
+                positionClass = 'rank-card-center';
+                zIndex = 100;
+            } else if (index === currentRankIndex - 1) {
+                positionClass = 'rank-card-left';
+                zIndex = 90;
+            } else if (index === currentRankIndex + 1) {
+                positionClass = 'rank-card-right';
+                zIndex = 90;
+            } else if (index === currentRankIndex - 2) {
+                positionClass = 'rank-card-far-left';
+                zIndex = 80;
+            } else if (index === currentRankIndex + 2) {
+                positionClass = 'rank-card-far-right';
+                zIndex = 80;
+            }
+            
+            // Create the card element
+            const rankCard = document.createElement('div');
+            rankCard.className = `rank-card ${positionClass}`;
+            rankCard.setAttribute('data-rank-index', index);
+            rankCard.style.zIndex = zIndex;
+            
+            // Add color class based on rank color
+            const rankColor = rankData.color.toLowerCase();
+            rankCard.classList.add(`rank-${rankColor}`);
+            
+            // Add "completed" class if this rank is lower than current
+            if (index < currentRankIndex) {
+                rankCard.classList.add('rank-completed');
+            }
+            
+            // Add card content
+            rankCard.innerHTML = `
+                <div class="rank-card-icon">
+                    <div class="hexagon-container">
+                        <div class="hexagon ${rankColor}">
+                            <div class="hexagon-content">
+                                <div class="knife-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rank-card-title">${rankName}</div>
+                <div class="rank-card-subtitle">(${rankData.color})</div>
+            `;
+            
+            // Add click handler for left and right cards
+            if (positionClass === 'rank-card-left' || positionClass === 'rank-card-right') {
+                rankCard.addEventListener('click', () => {
+                    rotateCardStack(index);
+                });
+            }
+            
+            // Add the card to the stack
+            cardStack.appendChild(rankCard);
+        });
+        
+        // Add the card stack to container
+        cardStackContainer.appendChild(cardStack);
+        
+        // Add navigation controls (optional)
+        const navControls = document.createElement('div');
+        navControls.className = 'rank-card-nav';
+        navControls.innerHTML = `
+            <button id="prevRankBtn" class="rank-nav-btn ${currentRankIndex === 0 ? 'disabled' : ''}">← Previous</button>
+            <button id="nextRankBtn" class="rank-nav-btn ${currentRankIndex === allRanks.length - 1 ? 'disabled' : ''}">Next →</button>
+        `;
+        cardStackContainer.appendChild(navControls);
+        
+        // Add the container to section
+        carouselSection.appendChild(cardStackContainer);
+        
+        // Add event listeners for navigation buttons
+        setTimeout(() => {
+            const prevBtn = document.getElementById('prevRankBtn');
+            const nextBtn = document.getElementById('nextRankBtn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentRankIndex > 0) {
+                        rotateCardStack(currentRankIndex - 1);
+                    }
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    if (currentRankIndex < allRanks.length - 1) {
+                        rotateCardStack(currentRankIndex + 1);
+                    }
+                });
+            }
+        }, 0);
+        
+        return carouselSection;
+    }
+
+    /**
+     * Rotate the card stack
+     * @param {number} targetIndex - The target rank index
+     */
+    function rotateCardStack(targetIndex) {
+        const cardStack = document.getElementById('rankCardStack');
+        if (!cardStack) return;
+        
+        // Get all cards
+        const cards = cardStack.querySelectorAll('.rank-card');
+        if (!cards.length) return;
+        
+        // Get current center card index
+        let currentCenterIndex = -1;
+        cards.forEach((card) => {
+            if (card.classList.contains('rank-card-center')) {
+                currentCenterIndex = parseInt(card.getAttribute('data-rank-index'));
+            }
+        });
+        
+        if (currentCenterIndex === -1) return;
+        
+        // Add transition class to enable animations
+        cardStack.classList.add('transitioning');
+        
+        // Update card positions and add/remove click handlers
+        cards.forEach(card => {
+            const cardIndex = parseInt(card.getAttribute('data-rank-index'));
+            
+            // Remove existing click handler by cloning the card content
+            const oldHtml = card.innerHTML;
+            card.innerHTML = oldHtml;
+            
+            // Remove all position classes
+            card.classList.remove(
+                'rank-card-center', 
+                'rank-card-left', 
+                'rank-card-right',
+                'rank-card-far-left',
+                'rank-card-far-right',
+                'rank-card-hidden'
+            );
+            
+            // Set new position class
+            let newClass = 'rank-card-hidden';
+            let zIndex = 0;
+            
+            if (cardIndex === targetIndex) {
+                newClass = 'rank-card-center';
+                zIndex = 100;
+                card.style.cursor = 'default';
+            } else if (cardIndex === targetIndex - 1) {
+                newClass = 'rank-card-left';
+                zIndex = 90;
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', function() {
+                    rotateCardStack(cardIndex);
+                });
+            } else if (cardIndex === targetIndex + 1) {
+                newClass = 'rank-card-right';
+                zIndex = 90;
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', function() {
+                    rotateCardStack(cardIndex);
+                });
+            } else if (cardIndex === targetIndex - 2) {
+                newClass = 'rank-card-far-left';
+                zIndex = 80;
+                card.style.cursor = 'default';
+            } else if (cardIndex === targetIndex + 2) {
+                newClass = 'rank-card-far-right';
+                zIndex = 80;
+                card.style.cursor = 'default';
+            }
+            
+            card.classList.add(newClass);
+            card.style.zIndex = zIndex;
+        });
+        
+        // Update navigation buttons
+        const prevBtn = document.getElementById('prevRankBtn');
+        const nextBtn = document.getElementById('nextRankBtn');
+        const allRanks = Object.keys(ProgressionSystem.RANKS);
+        
+        if (prevBtn) {
+            // Remove old event listeners by replacing with a clone
+            const newPrevBtn = prevBtn.cloneNode(true);
+            prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+            
+            // Add new event listener if not at the first rank
+            if (targetIndex > 0) {
+                newPrevBtn.classList.remove('disabled');
+                newPrevBtn.addEventListener('click', function() {
+                    rotateCardStack(targetIndex - 1);
+                });
+            } else {
+                newPrevBtn.classList.add('disabled');
+            }
+        }
+        
+        if (nextBtn) {
+            // Remove old event listeners by replacing with a clone
+            const newNextBtn = nextBtn.cloneNode(true);
+            nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+            
+            // Add new event listener if not at the last rank
+            if (targetIndex < allRanks.length - 1) {
+                newNextBtn.classList.remove('disabled');
+                newNextBtn.addEventListener('click', function() {
+                    rotateCardStack(targetIndex + 1);
+                });
+            } else {
+                newNextBtn.classList.add('disabled');
+            }
+        }
+        
+        // Remove transition class after animation completes
+        setTimeout(() => {
+            cardStack.classList.remove('transitioning');
+        }, 600); // Should match transition duration in CSS
+    }
+    
+    /**
      * Render the progress tab with detailed progression information
      * @param {Object} userProfile - The user profile
      */
@@ -619,10 +879,261 @@ const UIManager = (() => {
         title.textContent = 'Progress Tracking';
         progressTab.appendChild(title);
         
-        // Add content placeholder
-        const content = document.createElement('p');
-        content.textContent = 'Progress tracking features will be implemented in a future update.';
-        progressTab.appendChild(content);
+        // Get user stats
+        const stats = DataManager.getUserStats();
+        
+        // ---- RANK PROGRESS SECTION ----
+        // Replace the old rank visualization with our new card stack
+        const rankSection = createRankCardsCarousel(userProfile);
+        progressTab.appendChild(rankSection);
+        
+        // ---- ATTRIBUTE DETAILS SECTION ----
+        const attributesSection = document.createElement('div');
+        attributesSection.className = 'progress-section';
+        
+        // Section header
+        const attributesSectionHeader = document.createElement('h3');
+        attributesSectionHeader.className = 'section-subtitle';
+        attributesSectionHeader.textContent = 'Attribute Details';
+        attributesSection.appendChild(attributesSectionHeader);
+        
+        // Create attribute grid
+        const attributeGrid = document.createElement('div');
+        attributeGrid.className = 'attribute-grid';
+        
+        // Add details for each attribute
+        const attributes = ProgressionSystem.ATTRIBUTES;
+        
+        attributes.forEach(attrName => {
+            const attrData = userProfile.attributes[attrName];
+            if (!attrData) return;
+            
+            const attrDetail = document.createElement('div');
+            attrDetail.className = `attribute-detail ${attrName}-border`;
+            
+            // Get attribute's current rank and level
+            const attributeRank = attrData.currentRank || currentRank;
+            const attributeLevel = attrData.currentLevel || 1;
+            
+            // Display waiting status if applicable
+            let statusText = '';
+            if (attrData.waitingForUserRankUp) {
+                statusText = ` (Waiting for Rank Up)`;
+            }
+            
+            // Create attribute header with icon and name
+            const attrHeader = document.createElement('div');
+            attrHeader.className = 'attribute-header';
+            
+            // Choose icon based on attribute
+            let icon = '';
+            switch(attrName) {
+                case 'technique': icon = '🔪'; break;
+                case 'ingredients': icon = '🥕'; break;
+                case 'flavor': icon = '🌶️'; break;
+                case 'management': icon = '⏱️'; break;
+            }
+            
+            attrHeader.innerHTML = `
+                <span class="attribute-icon ${attrName}-icon"></span>
+                <h4>${attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h4>
+            `;
+            
+            attrDetail.appendChild(attrHeader);
+            
+            // Add attribute stats
+            const attrStats = document.createElement('div');
+            attrStats.className = 'attribute-stats';
+            
+            // Rank and level status
+            const rankStat = document.createElement('div');
+            rankStat.className = 'stat-row';
+            rankStat.innerHTML = `
+                <span class="stat-label">Rank:</span>
+                <span class="stat-value">${attributeRank}${statusText}</span>
+            `;
+            attrStats.appendChild(rankStat);
+            
+            // Level stat
+            const levelStat = document.createElement('div');
+            levelStat.className = 'stat-row';
+            levelStat.innerHTML = `
+                <span class="stat-label">Level:</span>
+                <span class="stat-value">${attributeLevel}</span>
+            `;
+            attrStats.appendChild(levelStat);
+            
+            // Total hours stat
+            const hoursStat = document.createElement('div');
+            hoursStat.className = 'stat-row';
+            hoursStat.innerHTML = `
+                <span class="stat-label">Total Hours:</span>
+                <span class="stat-value">${attrData.totalHours.toFixed(1)}</span>
+            `;
+            attrStats.appendChild(hoursStat);
+            
+            attrDetail.appendChild(attrStats);
+            
+            // Add progress bar using the levelProgressPercentage
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            
+            const progressFill = document.createElement('div');
+            progressFill.className = `progress-fill ${attrName}-fill`;
+            progressFill.style.width = `${attrData.levelProgressPercentage}%`;
+            
+            progressBar.appendChild(progressFill);
+            progressContainer.appendChild(progressBar);
+            
+            // Add progress labels
+            const progressLabels = document.createElement('div');
+            progressLabels.className = 'progress-labels';
+            
+            // Show current progress toward next level
+            const currentProgress = attrData.totalHours;
+            const nextLevel = attrData.hoursToNextLevel;
+            
+            const hoursLabel = document.createElement('span');
+            hoursLabel.textContent = `${currentProgress.toFixed(1)} / ${nextLevel.toFixed(1)} hrs`;
+            
+            const percentLabel = document.createElement('span');
+            percentLabel.textContent = `${Math.round(attrData.levelProgressPercentage)}%`;
+            
+            progressLabels.appendChild(hoursLabel);
+            progressLabels.appendChild(percentLabel);
+            
+            progressContainer.appendChild(progressLabels);
+            attrDetail.appendChild(progressContainer);
+            
+            // Add rank progress information
+            const rankProgressInfo = document.createElement('p');
+            rankProgressInfo.className = 'next-level-info';
+            rankProgressInfo.textContent = `Rank Progress: ${Math.round(attrData.rankProgressPercentage)}%`;
+            attrDetail.appendChild(rankProgressInfo);
+            
+            attributeGrid.appendChild(attrDetail);
+        });
+        
+        attributesSection.appendChild(attributeGrid);
+        progressTab.appendChild(attributesSection);
+        
+        // ---- RECENT ACHIEVEMENTS SECTION ----
+        const achievementsSection = document.createElement('div');
+        achievementsSection.className = 'progress-section';
+        
+        // Section header
+        const achievementsSectionHeader = document.createElement('h3');
+        achievementsSectionHeader.className = 'section-subtitle';
+        achievementsSectionHeader.textContent = 'Recent Achievements';
+        achievementsSection.appendChild(achievementsSectionHeader);
+        
+        // Get recent achievements
+        const recentAchievements = DataManager.getRecentAchievements(5);
+        
+        if (recentAchievements && recentAchievements.length > 0) {
+            // Create achievements list
+            const achievementsList = document.createElement('ul');
+            achievementsList.className = 'recent-quests-list';
+            
+            // Process each achievement
+            for (const achievement of recentAchievements) {
+                const achievementItem = document.createElement('li');
+                achievementItem.className = 'recent-quest-item';
+                
+                // Different display based on achievement type
+                if (achievement.type === 'quest_complete') {
+                    // Get quest type info
+                    const typeInfo = QuestManager.getQuestTypeInfo(achievement.questType);
+                    
+                    achievementItem.innerHTML = `
+                        <div class="quest-badge ${typeInfo.cssClass}">
+                            <span>✓</span>
+                        </div>
+                        <div class="quest-info">
+                            <h5 class="quest-title">${achievement.questTitle}</h5>
+                            <p class="quest-type">${typeInfo.name} Quest</p>
+                        </div>
+                    `;
+                } else if (achievement.type === 'rank_up') {
+                    achievementItem.innerHTML = `
+                        <div class="quest-badge" style="background-color:var(--accent-color-2);">
+                            <span>⭐</span>
+                        </div>
+                        <div class="quest-info">
+                            <h5 class="quest-title">Rank Advancement</h5>
+                            <p class="quest-type">${achievement.previousRank} → ${achievement.newRank}</p>
+                        </div>
+                    `;
+                } else if (achievement.type === 'level_up') {
+                    achievementItem.innerHTML = `
+                        <div class="quest-badge" style="background-color:var(--accent-color-3);">
+                            <span>↑</span>
+                        </div>
+                        <div class="quest-info">
+                            <h5 class="quest-title">Level Up</h5>
+                            <p class="quest-type">${achievement.rank} Level ${achievement.previousLevel} → ${achievement.newLevel}</p>
+                        </div>
+                    `;
+                }
+                
+                achievementsList.appendChild(achievementItem);
+            }
+            
+            achievementsSection.appendChild(achievementsList);
+        } else {
+            // No achievements message
+            const noAchievementsMessage = document.createElement('p');
+            noAchievementsMessage.className = 'no-quests-message';
+            noAchievementsMessage.textContent = 'Complete quests to see your achievements here!';
+            achievementsSection.appendChild(noAchievementsMessage);
+        }
+        
+        progressTab.appendChild(achievementsSection);
+        
+        // ---- OVERALL STATS SECTION ----
+        const statsSection = document.createElement('div');
+        statsSection.className = 'progress-section';
+        
+        // Section header
+        const statsSectionHeader = document.createElement('h3');
+        statsSectionHeader.className = 'section-subtitle';
+        statsSectionHeader.textContent = 'Overall Statistics';
+        statsSection.appendChild(statsSectionHeader);
+        
+        // Create stats grid
+        const statsGrid = document.createElement('div');
+        statsGrid.className = 'stats-cards';
+        
+        // Add stat cards
+        const statsData = [
+            { label: 'Quests Completed', value: userProfile.completedQuests.length },
+            { label: 'Hours Accumulated', value: stats.totalHours.toFixed(1) },
+            { label: 'Current Rank', value: `${userProfile.currentRank.title} ${userProfile.currentRank.level}` }
+        ];
+        
+        statsData.forEach(stat => {
+            const statCard = document.createElement('div');
+            statCard.className = 'stat-card';
+            
+            const statValue = document.createElement('div');
+            statValue.className = 'stat-value';
+            statValue.textContent = stat.value;
+            
+            const statLabel = document.createElement('div');
+            statLabel.className = 'stat-label';
+            statLabel.textContent = stat.label;
+            
+            statCard.appendChild(statValue);
+            statCard.appendChild(statLabel);
+            
+            statsGrid.appendChild(statCard);
+        });
+        
+        statsSection.appendChild(statsGrid);
+        progressTab.appendChild(statsSection);
     }
     
     // Define global functions needed by HTML
