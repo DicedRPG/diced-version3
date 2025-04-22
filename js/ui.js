@@ -863,235 +863,278 @@ const UIManager = (() => {
     }
     
     /**
-     * Render the progress tab with detailed progression information
-     * @param {Object} userProfile - The user profile
-     */
-    function renderProgressTab(userProfile) {
-        const progressTab = document.getElementById('progress-tab');
-        if (!progressTab) return;
+ * Render the progress tab with detailed progression information
+ * @param {Object} userProfile - The user profile
+ */
+function renderProgressTab(userProfile) {
+    const progressTab = document.getElementById('progress-tab');
+    if (!progressTab) return;
+    
+    // Clear existing content
+    progressTab.innerHTML = '';
+    
+    // Add section title
+    const title = document.createElement('h2');
+    title.className = 'section-title';
+    title.textContent = 'Progress Tracking';
+    progressTab.appendChild(title);
+    
+    // Get user stats
+    const stats = DataManager.getUserStats();
+    
+    // ---- RANK PROGRESS SECTION ----
+    // Replace the old rank visualization with our new card stack
+    const rankSection = createRankCardsCarousel(userProfile);
+    progressTab.appendChild(rankSection);
+    
+    // ---- OVERALL STATS SECTION ---- (MOVED HERE)
+    const statsSection = document.createElement('div');
+    statsSection.className = 'progress-section';
+    
+    // Section header
+    const statsSectionHeader = document.createElement('h3');
+    statsSectionHeader.className = 'section-subtitle';
+    statsSectionHeader.textContent = 'Overall Statistics';
+    statsSection.appendChild(statsSectionHeader);
+    
+    // Create stats grid
+    const statsGrid = document.createElement('div');
+    statsGrid.className = 'stats-cards';
+    
+    // Add stat cards
+    const statsData = [
+        { label: 'Quests Completed', value: userProfile.completedQuests.length },
+        { label: 'Hours Accumulated', value: stats.totalHours.toFixed(1) },
+        { label: 'Current Rank', value: `${userProfile.currentRank.title} ${userProfile.currentRank.level}` }
+    ];
+    
+    statsData.forEach(stat => {
+        const statCard = document.createElement('div');
+        statCard.className = 'stat-card';
         
-        // Clear existing content
-        progressTab.innerHTML = '';
+        const statValue = document.createElement('div');
+        statValue.className = 'stat-value';
+        statValue.textContent = stat.value;
         
-        // Add section title
-        const title = document.createElement('h2');
-        title.className = 'section-title';
-        title.textContent = 'Progress Tracking';
-        progressTab.appendChild(title);
+        const statLabel = document.createElement('div');
+        statLabel.className = 'stat-label';
+        statLabel.textContent = stat.label;
         
-        // Get user stats
-        const stats = DataManager.getUserStats();
+        statCard.appendChild(statValue);
+        statCard.appendChild(statLabel);
         
-        // ---- RANK PROGRESS SECTION ----
-        // Replace the old rank visualization with our new card stack
-        const rankSection = createRankCardsCarousel(userProfile);
-        progressTab.appendChild(rankSection);
+        statsGrid.appendChild(statCard);
+    });
+    
+    statsSection.appendChild(statsGrid);
+    progressTab.appendChild(statsSection);
+    
+    // ---- ATTRIBUTE DETAILS SECTION ----
+    const attributesSection = document.createElement('div');
+    attributesSection.className = 'progress-section';
+    
+    // Section header
+    const attributesSectionHeader = document.createElement('h3');
+    attributesSectionHeader.className = 'section-subtitle';
+    attributesSectionHeader.textContent = 'Attribute Details';
+    attributesSection.appendChild(attributesSectionHeader);
+    
+    // Create attribute grid
+    const attributeGrid = document.createElement('div');
+    attributeGrid.className = 'attribute-grid';
+    
+    // Add details for each attribute
+    const attributes = ProgressionSystem.ATTRIBUTES;
+    
+    attributes.forEach(attrName => {
+        const attrData = userProfile.attributes[attrName];
+        if (!attrData) return;
         
-        // ---- ATTRIBUTE DETAILS SECTION ----
-        const attributesSection = document.createElement('div');
-        attributesSection.className = 'progress-section';
+        const attrDetail = document.createElement('div');
+        attrDetail.className = `attribute-detail ${attrName}-border`;
         
-        // Section header
-        const attributesSectionHeader = document.createElement('h3');
-        attributesSectionHeader.className = 'section-subtitle';
-        attributesSectionHeader.textContent = 'Attribute Details';
-        attributesSection.appendChild(attributesSectionHeader);
+        // Get attribute's current rank and level
+        const attributeRank = attrData.currentRank || currentRank;
+        const attributeLevel = attrData.currentLevel || 1;
         
-        // Create attribute grid
-        const attributeGrid = document.createElement('div');
-        attributeGrid.className = 'attribute-grid';
-        
-        // Add details for each attribute
-        const attributes = ProgressionSystem.ATTRIBUTES;
-        
-        attributes.forEach(attrName => {
-            const attrData = userProfile.attributes[attrName];
-            if (!attrData) return;
-            
-            const attrDetail = document.createElement('div');
-            attrDetail.className = `attribute-detail ${attrName}-border`;
-            
-            // Get attribute's current rank and level
-            const attributeRank = attrData.currentRank || currentRank;
-            const attributeLevel = attrData.currentLevel || 1;
-            
-            // Display waiting status if applicable
-            let statusText = '';
-            if (attrData.waitingForUserRankUp) {
-                statusText = ` (Waiting for Rank Up)`;
-            }
-            
-            // Create attribute header with icon and name
-            const attrHeader = document.createElement('div');
-            attrHeader.className = 'attribute-header';
-            
-            // Choose icon based on attribute
-            let icon = '';
-            switch(attrName) {
-                case 'technique': icon = '🔪'; break;
-                case 'ingredients': icon = '🥕'; break;
-                case 'flavor': icon = '🌶️'; break;
-                case 'management': icon = '⏱️'; break;
-            }
-            
-            attrHeader.innerHTML = `
-                <span class="attribute-icon ${attrName}-icon"></span>
-                <h4>${attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h4>
-            `;
-            
-            attrDetail.appendChild(attrHeader);
-            
-            // Add attribute stats
-            const attrStats = document.createElement('div');
-            attrStats.className = 'attribute-stats';
-            
-            // Rank and level status
-            const rankStat = document.createElement('div');
-            rankStat.className = 'stat-row';
-            rankStat.innerHTML = `
-                <span class="stat-label">Rank:</span>
-                <span class="stat-value">${attributeRank}${statusText}</span>
-            `;
-            attrStats.appendChild(rankStat);
-            
-            // Level stat
-            const levelStat = document.createElement('div');
-            levelStat.className = 'stat-row';
-            levelStat.innerHTML = `
-                <span class="stat-label">Level:</span>
-                <span class="stat-value">${attributeLevel}</span>
-            `;
-            attrStats.appendChild(levelStat);
-            
-            // Total hours stat
-            const hoursStat = document.createElement('div');
-            hoursStat.className = 'stat-row';
-            hoursStat.innerHTML = `
-                <span class="stat-label">Total Hours:</span>
-                <span class="stat-value">${attrData.totalHours.toFixed(1)}</span>
-            `;
-            attrStats.appendChild(hoursStat);
-            
-            attrDetail.appendChild(attrStats);
-            
-            // Add progress bar using the levelProgressPercentage
-            const progressContainer = document.createElement('div');
-            progressContainer.className = 'progress-container';
-            
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar';
-            
-            const progressFill = document.createElement('div');
-            progressFill.className = `progress-fill ${attrName}-fill`;
-            progressFill.style.width = `${attrData.levelProgressPercentage}%`;
-            
-            progressBar.appendChild(progressFill);
-            progressContainer.appendChild(progressBar);
-            
-            // Add progress labels
-            const progressLabels = document.createElement('div');
-            progressLabels.className = 'progress-labels';
-            
-            // Show current progress toward next level
-            const currentProgress = attrData.totalHours;
-            const nextLevel = attrData.hoursToNextLevel;
-            
-            const hoursLabel = document.createElement('span');
-            hoursLabel.textContent = `${currentProgress.toFixed(1)} / ${nextLevel.toFixed(1)} hrs`;
-            
-            const percentLabel = document.createElement('span');
-            percentLabel.textContent = `${Math.round(attrData.levelProgressPercentage)}%`;
-            
-            progressLabels.appendChild(hoursLabel);
-            progressLabels.appendChild(percentLabel);
-            
-            progressContainer.appendChild(progressLabels);
-            attrDetail.appendChild(progressContainer);
-            
-            // Add rank progress information
-            const rankProgressInfo = document.createElement('p');
-            rankProgressInfo.className = 'next-level-info';
-            rankProgressInfo.textContent = `Rank Progress: ${Math.round(attrData.rankProgressPercentage)}%`;
-            attrDetail.appendChild(rankProgressInfo);
-            
-            attributeGrid.appendChild(attrDetail);
-        });
-        
-        attributesSection.appendChild(attributeGrid);
-        progressTab.appendChild(attributesSection);
-        
-        // ---- RECENT ACHIEVEMENTS SECTION ----
-        const achievementsSection = document.createElement('div');
-        achievementsSection.className = 'progress-section';
-        
-        // Section header
-        const achievementsSectionHeader = document.createElement('h3');
-        achievementsSectionHeader.className = 'section-subtitle';
-        achievementsSectionHeader.textContent = 'Recent Achievements';
-        achievementsSection.appendChild(achievementsSectionHeader);
-        
-        // Get recent achievements
-        const recentAchievements = DataManager.getRecentAchievements(5);
-        
-        if (recentAchievements && recentAchievements.length > 0) {
-            // Create achievements list
-            const achievementsList = document.createElement('ul');
-            achievementsList.className = 'recent-quests-list';
-            
-            // Process each achievement
-            for (const achievement of recentAchievements) {
-                const achievementItem = document.createElement('li');
-                achievementItem.className = 'recent-quest-item';
-                
-                // Different display based on achievement type
-                if (achievement.type === 'quest_complete') {
-                    // Get quest type info
-                    const typeInfo = QuestManager.getQuestTypeInfo(achievement.questType);
-                    
-                    achievementItem.innerHTML = `
-                        <div class="quest-badge ${typeInfo.cssClass}">
-                            <span>✓</span>
-                        </div>
-                        <div class="quest-info">
-                            <h5 class="quest-title">${achievement.questTitle}</h5>
-                            <p class="quest-type">${typeInfo.name} Quest</p>
-                        </div>
-                    `;
-                } else if (achievement.type === 'rank_up') {
-                    achievementItem.innerHTML = `
-                        <div class="quest-badge" style="background-color:var(--accent-color-2);">
-                            <span>⭐</span>
-                        </div>
-                        <div class="quest-info">
-                            <h5 class="quest-title">Rank Advancement</h5>
-                            <p class="quest-type">${achievement.previousRank} → ${achievement.newRank}</p>
-                        </div>
-                    `;
-                } else if (achievement.type === 'level_up') {
-                    achievementItem.innerHTML = `
-                        <div class="quest-badge" style="background-color:var(--accent-color-3);">
-                            <span>↑</span>
-                        </div>
-                        <div class="quest-info">
-                            <h5 class="quest-title">Level Up</h5>
-                            <p class="quest-type">${achievement.rank} Level ${achievement.previousLevel} → ${achievement.newLevel}</p>
-                        </div>
-                    `;
-                }
-                
-                achievementsList.appendChild(achievementItem);
-            }
-            
-            achievementsSection.appendChild(achievementsList);
-        } else {
-            // No achievements message
-            const noAchievementsMessage = document.createElement('p');
-            noAchievementsMessage.className = 'no-quests-message';
-            noAchievementsMessage.textContent = 'Complete quests to see your achievements here!';
-            achievementsSection.appendChild(noAchievementsMessage);
+        // Display waiting status if applicable
+        let statusText = '';
+        if (attrData.waitingForUserRankUp) {
+            statusText = ` (Waiting for Rank Up)`;
         }
         
-        progressTab.appendChild(achievementsSection);
+        // Create attribute header with icon and name
+        const attrHeader = document.createElement('div');
+        attrHeader.className = 'attribute-header';
+        
+        // Choose icon based on attribute
+        let icon = '';
+        switch(attrName) {
+            case 'technique': icon = '🔪'; break;
+            case 'ingredients': icon = '🥕'; break;
+            case 'flavor': icon = '🌶️'; break;
+            case 'management': icon = '⏱️'; break;
+        }
+        
+        attrHeader.innerHTML = `
+            <span class="attribute-icon ${attrName}-icon"></span>
+            <h4>${attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h4>
+        `;
+        
+        attrDetail.appendChild(attrHeader);
+        
+        // Add attribute stats
+        const attrStats = document.createElement('div');
+        attrStats.className = 'attribute-stats';
+        
+        // Rank and level status
+        const rankStat = document.createElement('div');
+        rankStat.className = 'stat-row';
+        rankStat.innerHTML = `
+            <span class="stat-label">Rank:</span>
+            <span class="stat-value">${attributeRank}${statusText}</span>
+        `;
+        attrStats.appendChild(rankStat);
+        
+        // Level stat
+        const levelStat = document.createElement('div');
+        levelStat.className = 'stat-row';
+        levelStat.innerHTML = `
+            <span class="stat-label">Level:</span>
+            <span class="stat-value">${attributeLevel}</span>
+        `;
+        attrStats.appendChild(levelStat);
+        
+        // Total hours stat
+        const hoursStat = document.createElement('div');
+        hoursStat.className = 'stat-row';
+        hoursStat.innerHTML = `
+            <span class="stat-label">Total Hours:</span>
+            <span class="stat-value">${attrData.totalHours.toFixed(1)}</span>
+        `;
+        attrStats.appendChild(hoursStat);
+        
+        attrDetail.appendChild(attrStats);
+        
+        // Add progress bar using the levelProgressPercentage
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        
+        const progressFill = document.createElement('div');
+        progressFill.className = `progress-fill ${attrName}-fill`;
+        progressFill.style.width = `${attrData.levelProgressPercentage}%`;
+        
+        progressBar.appendChild(progressFill);
+        progressContainer.appendChild(progressBar);
+        
+        // Add progress labels
+        const progressLabels = document.createElement('div');
+        progressLabels.className = 'progress-labels';
+        
+        // Show current progress toward next level
+        const currentProgress = attrData.totalHours;
+        const nextLevel = attrData.hoursToNextLevel;
+        
+        const hoursLabel = document.createElement('span');
+        hoursLabel.textContent = `${currentProgress.toFixed(1)} / ${nextLevel.toFixed(1)} hrs`;
+        
+        const percentLabel = document.createElement('span');
+        percentLabel.textContent = `${Math.round(attrData.levelProgressPercentage)}%`;
+        
+        progressLabels.appendChild(hoursLabel);
+        progressLabels.appendChild(percentLabel);
+        
+        progressContainer.appendChild(progressLabels);
+        attrDetail.appendChild(progressContainer);
+        
+        // Add rank progress information
+        const rankProgressInfo = document.createElement('p');
+        rankProgressInfo.className = 'next-level-info';
+        rankProgressInfo.textContent = `Rank Progress: ${Math.round(attrData.rankProgressPercentage)}%`;
+        attrDetail.appendChild(rankProgressInfo);
+        
+        attributeGrid.appendChild(attrDetail);
+    });
+    
+    attributesSection.appendChild(attributeGrid);
+    progressTab.appendChild(attributesSection);
+    
+    // ---- RECENT ACHIEVEMENTS SECTION ----
+    const achievementsSection = document.createElement('div');
+    achievementsSection.className = 'progress-section';
+    
+    // Section header
+    const achievementsSectionHeader = document.createElement('h3');
+    achievementsSectionHeader.className = 'section-subtitle';
+    achievementsSectionHeader.textContent = 'Recent Achievements';
+    achievementsSection.appendChild(achievementsSectionHeader);
+    
+    // Get recent achievements
+    const recentAchievements = DataManager.getRecentAchievements(5);
+    
+    if (recentAchievements && recentAchievements.length > 0) {
+        // Create achievements list
+        const achievementsList = document.createElement('ul');
+        achievementsList.className = 'recent-quests-list';
+        
+        // Process each achievement
+        for (const achievement of recentAchievements) {
+            const achievementItem = document.createElement('li');
+            achievementItem.className = 'recent-quest-item';
+            
+            // Different display based on achievement type
+            if (achievement.type === 'quest_complete') {
+                // Get quest type info
+                const typeInfo = QuestManager.getQuestTypeInfo(achievement.questType);
+                
+                achievementItem.innerHTML = `
+                    <div class="quest-badge ${typeInfo.cssClass}">
+                        <span>✓</span>
+                    </div>
+                    <div class="quest-info">
+                        <h5 class="quest-title">${achievement.questTitle}</h5>
+                        <p class="quest-type">${typeInfo.name} Quest</p>
+                    </div>
+                `;
+            } else if (achievement.type === 'rank_up') {
+                achievementItem.innerHTML = `
+                    <div class="quest-badge" style="background-color:var(--accent-color-2);">
+                        <span>⭐</span>
+                    </div>
+                    <div class="quest-info">
+                        <h5 class="quest-title">Rank Advancement</h5>
+                        <p class="quest-type">${achievement.previousRank} → ${achievement.newRank}</p>
+                    </div>
+                `;
+            } else if (achievement.type === 'level_up') {
+                achievementItem.innerHTML = `
+                    <div class="quest-badge" style="background-color:var(--accent-color-3);">
+                        <span>↑</span>
+                    </div>
+                    <div class="quest-info">
+                        <h5 class="quest-title">Level Up</h5>
+                        <p class="quest-type">${achievement.rank} Level ${achievement.previousLevel} → ${achievement.newLevel}</p>
+                    </div>
+                `;
+            }
+            
+            achievementsList.appendChild(achievementItem);
+        }
+        
+        achievementsSection.appendChild(achievementsList);
+    } else {
+        // No achievements message
+        const noAchievementsMessage = document.createElement('p');
+        noAchievementsMessage.className = 'no-quests-message';
+        noAchievementsMessage.textContent = 'Complete quests to see your achievements here!';
+        achievementsSection.appendChild(noAchievementsMessage);
+    }
+    
+    progressTab.appendChild(achievementsSection);
+}
         
         // ---- OVERALL STATS SECTION ----
         const statsSection = document.createElement('div');
