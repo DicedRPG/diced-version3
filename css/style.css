@@ -826,7 +826,7 @@ header {
 .rank-card-stack-container {
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 300px;
     perspective: 1000px;
     margin: 15px 0;
     overflow: hidden;
