@@ -153,34 +153,131 @@ document.addEventListener('DOMContentLoaded', function() {
       const cards = cardStack.querySelectorAll('.rank-card');
       if (!cards.length) return;
       
+      // Calculate the swipe progress as a percentage (0 to 1)
+      // Limit to a reasonable range to prevent excessive movement
+      const maxSwipe = 150; // Maximum effective swipe distance
+      const progress = Math.max(-1, Math.min(1, deltaX / maxSwipe));
+      
       // Apply transformation to each card based on its position
       cards.forEach(card => {
+        // Get the original position class of this card
+        let positionClass = '';
+        if (card.classList.contains('rank-card-center')) positionClass = 'center';
+        else if (card.classList.contains('rank-card-left')) positionClass = 'left';
+        else if (card.classList.contains('rank-card-right')) positionClass = 'right';
+        else if (card.classList.contains('rank-card-far-left')) positionClass = 'far-left';
+        else if (card.classList.contains('rank-card-far-right')) positionClass = 'far-right';
+        else positionClass = 'hidden';
+        
+        // Apply a transform that maintains the rotational movement
         const cardIndex = parseInt(card.getAttribute('data-rank-index'));
-        let transformAmount = 0;
         
-        // Determine how much to transform based on card position
-        if (card.classList.contains('rank-card-center')) {
-          // Center card - move in the direction of the swipe
-          transformAmount = deltaX * 0.3;
-        } else if (card.classList.contains('rank-card-left')) {
-          // Left card - come into view when swiping right
-          transformAmount = deltaX > 0 ? deltaX * 0.5 : deltaX * 0.1;
-        } else if (card.classList.contains('rank-card-right')) {
-          // Right card - come into view when swiping left
-          transformAmount = deltaX < 0 ? deltaX * 0.5 : deltaX * 0.1;
-        } else if (card.classList.contains('rank-card-far-left')) {
-          // Far left card - slight movement
-          transformAmount = deltaX > 0 ? deltaX * 0.2 : 0;
-        } else if (card.classList.contains('rank-card-far-right')) {
-          // Far right card - slight movement
-          transformAmount = deltaX < 0 ? deltaX * 0.2 : 0;
-        }
+        // Reset any previous inline transform
+        card.style.transform = '';
         
-        // Apply the transform
-        const currentTransform = getComputedStyle(card).transform;
-        if (currentTransform && currentTransform !== 'none') {
-          // We need to add our translation to the existing transform
-          card.style.transform = currentTransform + ` translateX(${transformAmount}px)`;
+        // Remove all position classes temporarily
+        card.classList.remove(
+          'rank-card-center', 
+          'rank-card-left', 
+          'rank-card-right',
+          'rank-card-far-left',
+          'rank-card-far-right',
+          'rank-card-hidden'
+        );
+        
+        // Determine new position based on swipe direction and progress
+        let newPositionClass = '';
+        
+        if (progress > 0) { // Swiping right (showing previous card)
+          switch(positionClass) {
+            case 'center':
+              // Move toward right position
+              newPositionClass = progress > 0.5 ? 'right' : 'center';
+              card.classList.add(newPositionClass === 'right' ? 'rank-card-right' : 'rank-card-center');
+              card.style.opacity = newPositionClass === 'right' ? 0.9 : 1;
+              break;
+            case 'left':
+              // Move toward center position
+              newPositionClass = progress > 0.5 ? 'center' : 'left';
+              card.classList.add(newPositionClass === 'center' ? 'rank-card-center' : 'rank-card-left');
+              card.style.opacity = newPositionClass === 'center' ? 1 : 0.9;
+              break;
+            case 'right':
+              // Move toward far-right position
+              newPositionClass = progress > 0.5 ? 'far-right' : 'right';
+              card.classList.add(newPositionClass === 'far-right' ? 'rank-card-far-right' : 'rank-card-right');
+              card.style.opacity = newPositionClass === 'far-right' ? 0.5 : 0.9;
+              break;
+            case 'far-left':
+              // Move toward left position
+              newPositionClass = progress > 0.5 ? 'left' : 'far-left';
+              card.classList.add(newPositionClass === 'left' ? 'rank-card-left' : 'rank-card-far-left');
+              card.style.opacity = newPositionClass === 'left' ? 0.9 : 0.5;
+              break;
+            case 'far-right':
+              // Move toward hidden position
+              newPositionClass = 'far-right';
+              card.classList.add('rank-card-far-right');
+              card.style.opacity = 0.5 * (1 - progress);
+              break;
+            case 'hidden':
+              // Check if this should become visible
+              if (cardIndex === currentCenterIndex - 3) {
+                newPositionClass = progress > 0.7 ? 'far-left' : 'hidden';
+                card.classList.add(newPositionClass === 'far-left' ? 'rank-card-far-left' : 'rank-card-hidden');
+                card.style.opacity = newPositionClass === 'far-left' ? 0.5 * progress : 0;
+              } else {
+                card.classList.add('rank-card-hidden');
+              }
+              break;
+          }
+        } else if (progress < 0) { // Swiping left (showing next card)
+          const absProgress = Math.abs(progress);
+          switch(positionClass) {
+            case 'center':
+              // Move toward left position
+              newPositionClass = absProgress > 0.5 ? 'left' : 'center';
+              card.classList.add(newPositionClass === 'left' ? 'rank-card-left' : 'rank-card-center');
+              card.style.opacity = newPositionClass === 'left' ? 0.9 : 1;
+              break;
+            case 'left':
+              // Move toward far-left position
+              newPositionClass = absProgress > 0.5 ? 'far-left' : 'left';
+              card.classList.add(newPositionClass === 'far-left' ? 'rank-card-far-left' : 'rank-card-left');
+              card.style.opacity = newPositionClass === 'far-left' ? 0.5 : 0.9;
+              break;
+            case 'right':
+              // Move toward center position
+              newPositionClass = absProgress > 0.5 ? 'center' : 'right';
+              card.classList.add(newPositionClass === 'center' ? 'rank-card-center' : 'rank-card-right');
+              card.style.opacity = newPositionClass === 'center' ? 1 : 0.9;
+              break;
+            case 'far-left':
+              // Move toward hidden position
+              newPositionClass = 'far-left';
+              card.classList.add('rank-card-far-left');
+              card.style.opacity = 0.5 * (1 - absProgress);
+              break;
+            case 'far-right':
+              // Move toward right position
+              newPositionClass = absProgress > 0.5 ? 'right' : 'far-right';
+              card.classList.add(newPositionClass === 'right' ? 'rank-card-right' : 'rank-card-far-right');
+              card.style.opacity = newPositionClass === 'right' ? 0.9 : 0.5;
+              break;
+            case 'hidden':
+              // Check if this should become visible
+              if (cardIndex === currentCenterIndex + 3) {
+                newPositionClass = absProgress > 0.7 ? 'far-right' : 'hidden';
+                card.classList.add(newPositionClass === 'far-right' ? 'rank-card-far-right' : 'rank-card-hidden');
+                card.style.opacity = newPositionClass === 'far-right' ? 0.5 * absProgress : 0;
+              } else {
+                card.classList.add('rank-card-hidden');
+              }
+              break;
+          }
+        } else {
+          // No movement, restore original class
+          card.classList.add(`rank-card-${positionClass}`);
         }
       });
     }
@@ -190,17 +287,11 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {number} deltaX - The distance the user has swiped
      */
     function completeSwipe(deltaX) {
-      // Remove the swiping class to enable normal transitions
-      cardStack.classList.remove('swiping');
-      
-      // Reset all card styles to remove the temporary transforms
-      const cards = cardStack.querySelectorAll('.rank-card');
-      cards.forEach(card => {
-        card.style.transform = '';
-      });
+      // Calculate the absolute movement
+      const absMovement = Math.abs(deltaX);
       
       // Determine if we should change the current card
-      if (Math.abs(deltaX) >= swipeThreshold) {
+      if (absMovement >= swipeThreshold) {
         // Calculate target index
         let targetIndex = currentCenterIndex;
         
@@ -215,21 +306,65 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Only rotate if the target index is different
         if (targetIndex !== currentCenterIndex) {
-          // Call the existing rotate function
-          rotateCardStack(targetIndex);
+          // Remove the swiping class to allow normal transitions
+          cardStack.classList.remove('swiping');
           
-          // Update current index
-          currentCenterIndex = targetIndex;
+          // Reset all styles
+          const cards = cardStack.querySelectorAll('.rank-card');
+          cards.forEach(card => {
+            card.style.transform = '';
+            card.style.opacity = '';
+          });
+          
+          // Call the existing rotate function with slight delay to ensure clean transition
+          setTimeout(() => {
+            rotateCardStack(targetIndex);
+            
+            // Update current index
+            currentCenterIndex = targetIndex;
+          }, 10);
         } else {
-          // If we can't move further, add a bounce effect
+          // If we can't move further (at first or last card)
+          // Reset all styles
+          const cards = cardStack.querySelectorAll('.rank-card');
+          cards.forEach(card => {
+            // Keep the current position class
+            let positionClass = '';
+            if (card.classList.contains('rank-card-center')) positionClass = 'center';
+            else if (card.classList.contains('rank-card-left')) positionClass = 'left';
+            else if (card.classList.contains('rank-card-right')) positionClass = 'right';
+            else if (card.classList.contains('rank-card-far-left')) positionClass = 'far-left';
+            else if (card.classList.contains('rank-card-far-right')) positionClass = 'far-right';
+            else positionClass = 'hidden';
+            
+            // Reset to original positions
+            card.style.transform = '';
+            card.style.opacity = '';
+            
+            // Remove the swiping class to allow normal transitions
+            cardStack.classList.remove('swiping');
+          });
+          
+          // Add a bounce effect
           cardStack.classList.add('bounce-effect');
           setTimeout(() => {
             cardStack.classList.remove('bounce-effect');
           }, 400);
         }
       } else {
-        // Not enough movement to change cards, just reset positions
-        // Add a small bounce effect to indicate the swipe didn't register
+        // Not enough movement to change cards
+        // Reset all card styles
+        const cards = cardStack.querySelectorAll('.rank-card');
+        cards.forEach(card => {
+          // Reset transforms and opacity
+          card.style.transform = '';
+          card.style.opacity = '';
+        });
+        
+        // Remove the swiping class to allow normal transitions
+        cardStack.classList.remove('swiping');
+        
+        // Add a small reset effect
         cardStack.classList.add('reset-effect');
         setTimeout(() => {
           cardStack.classList.remove('reset-effect');
