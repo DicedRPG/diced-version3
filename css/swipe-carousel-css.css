@@ -1,108 +1,109 @@
-/* Swipe Carousel CSS for DICED App */
+/* Enhanced styles for swipe-enabled card carousel */
 
-/* Default transition for card movements */
-.rank-card-stack .rank-card {
-    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
-                left 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
-                right 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+/* Base swipe indicator styles */
+.rank-card-stack {
+    transition: transform 0.3s ease;
 }
 
-/* Remove transitions during active swiping for immediate feedback */
-.rank-card-stack.swiping .rank-card {
-    transition: all 0.1s ease-out !important;
+.rank-card-stack.swipe-enabled {
+    cursor: grab;
 }
 
-/* Visual feedback when dragging */
-.rank-card-stack.is-dragging,
-.rank-card-stack.is-touching {
+.rank-card-stack.active-swipe {
     cursor: grabbing;
 }
 
-/* Bounce effect when trying to swipe past the first or last card */
-@keyframes bounce-effect {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(5px); }
-    50% { transform: translateX(-5px); }
-    75% { transform: translateX(3px); }
-}
-
-.rank-card-stack.bounce-effect {
-    animation: bounce-effect 0.4s ease;
-}
-
-/* Reset effect when a swipe doesn't reach the threshold */
-@keyframes reset-effect {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(3px); }
-}
-
-.rank-card-stack.reset-effect {
-    animation: reset-effect 0.4s ease;
-}
-
-/* Make cards tilt slightly when swiping for more visual feedback */
-.rank-card-stack.swiping .rank-card-center {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Increase shadow intensity for active card during swiping */
-.rank-card-stack.is-dragging .rank-card-center,
-.rank-card-stack.is-touching .rank-card-center {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* Ensure the card stack has proper touch handling */
-.rank-card-stack-container {
-    touch-action: none;
+/* Prevent text selection during swipe */
+.rank-card-stack.swipe-enabled .rank-card {
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-/* Highlight the cards to indicate swipe direction */
-.rank-card-stack.swiping .rank-card-left {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-    /* Add subtle glow for left card when swiping right */
-    filter: brightness(1.05);
+/* Smooth transition animations */
+.rank-card-stack.transitioning .rank-card {
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-.rank-card-stack.swiping .rank-card-right {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-    /* Add subtle glow for right card when swiping left */
-    filter: brightness(1.05);
+/* Add subtle swipe feedback during touch */
+.rank-card-stack.active-swipe .rank-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Add smooth transition when returning from swiping state */
-.rank-card-stack:not(.swiping) .rank-card {
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-}
-
-/* Ensure cards stay visible during swipe with proper stacking */
-.rank-card-stack.swiping .rank-card-hidden {
-    opacity: 0.3;
+/* Mobile visual hint overlay */
+.swipe-hint-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
     pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 200;
+    border-radius: 12px;
 }
 
-/* Adjust the stacking and perspective during swiping */
-.rank-card-stack.swiping {
-    perspective: 1200px;
+.swipe-hint-overlay.visible {
+    opacity: 1;
+    animation: fadeInOut 3s forwards;
 }
 
-/* Improve the 3D effect during swiping by adjusting perspective origin */
-.rank-card-stack-container.swiping {
-    perspective-origin: center center;
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
 }
 
-/* Enhance the swipe animation with proper rotation */
-.rank-card-stack.swiping .rank-card-center {
-    transform-origin: center center;
+.swipe-hint-content {
+    color: white;
+    text-align: center;
+    padding: 20px;
 }
 
-.rank-card-stack.swiping .rank-card-left,
-.rank-card-stack.swiping .rank-card-far-left {
-    transform-origin: left center;
+.swipe-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
 }
 
-.rank-card-stack.swiping .rank-card-right,
-.rank-card-stack.swiping .rank-card-far-right {
-    transform-origin: right center;
+/* Add subtle accessibility improvements */
+.rank-card:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+}
+
+/* Enhance tap targets on mobile */
+@media (max-width: 480px) {
+    .rank-nav-btn {
+        padding: 10px 18px;
+        min-width: 100px;
+    }
+    
+    /* Make side cards more visible on smaller screens */
+    .rank-card-left {
+        transform: translateX(-110%) translateZ(-100px) rotateY(15deg) scale(0.85);
+    }
+    
+    .rank-card-right {
+        transform: translateX(10%) translateZ(-100px) rotateY(-15deg) scale(0.85);
+    }
+    
+    /* Add visual feedback for active cards */
+    .rank-card-center:active,
+    .rank-card-left:active,
+    .rank-card-right:active {
+        transform: scale(0.98) translateX(-50%);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Adjust for touch inaccuracy */
+    .rank-card-nav {
+        margin-top: 30px;
+    }
 }
