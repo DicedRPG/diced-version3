@@ -1052,8 +1052,8 @@ header {
 /* Mobile-specific adjustments */
 @media (max-width: 480px) {
     .rank-card {
-        width: 162.5px;
-        height: 200px;
+        width: 182px;
+        height: 224px;
     }
     
     .hexagon-container {
