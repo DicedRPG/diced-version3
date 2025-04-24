@@ -2,12 +2,15 @@
 
 /* Default transition for card movements */
 .rank-card-stack .rank-card {
-    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                left 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                right 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* Remove transitions during active swiping for immediate feedback */
 .rank-card-stack.swiping .rank-card {
-    transition: none !important;
+    transition: all 0.1s ease-out !important;
 }
 
 /* Visual feedback when dragging */
@@ -55,10 +58,17 @@
     user-select: none;
 }
 
-/* Highlight the edges of the cards to indicate swipe direction */
-.rank-card-stack.swiping .rank-card-left,
+/* Highlight the cards to indicate swipe direction */
+.rank-card-stack.swiping .rank-card-left {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    /* Add subtle glow for left card when swiping right */
+    filter: brightness(1.05);
+}
+
 .rank-card-stack.swiping .rank-card-right {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    /* Add subtle glow for right card when swiping left */
+    filter: brightness(1.05);
 }
 
 /* Add smooth transition when returning from swiping state */
@@ -66,8 +76,33 @@
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
-/* Ensure cards stay visible during swipe */
+/* Ensure cards stay visible during swipe with proper stacking */
 .rank-card-stack.swiping .rank-card-hidden {
     opacity: 0.3;
     pointer-events: none;
+}
+
+/* Adjust the stacking and perspective during swiping */
+.rank-card-stack.swiping {
+    perspective: 1200px;
+}
+
+/* Improve the 3D effect during swiping by adjusting perspective origin */
+.rank-card-stack-container.swiping {
+    perspective-origin: center center;
+}
+
+/* Enhance the swipe animation with proper rotation */
+.rank-card-stack.swiping .rank-card-center {
+    transform-origin: center center;
+}
+
+.rank-card-stack.swiping .rank-card-left,
+.rank-card-stack.swiping .rank-card-far-left {
+    transform-origin: left center;
+}
+
+.rank-card-stack.swiping .rank-card-right,
+.rank-card-stack.swiping .rank-card-far-right {
+    transform-origin: right center;
 }
