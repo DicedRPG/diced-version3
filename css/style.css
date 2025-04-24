@@ -1057,8 +1057,8 @@ header {
     }
     
     .hexagon-container {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
     }
     
     .knife-icon {
@@ -1067,11 +1067,11 @@ header {
     }
     
     .rank-card-title {
-        font-size: 16px;
+        font-size: 18px;
     }
     
     .rank-card-subtitle {
-        font-size: 12px;
+        font-size: 14px;
     }
     
     .rank-card-left {
